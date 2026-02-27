@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/admin/AdminSidebar.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   // Cerrar sidebar al pasar a desktop (si cambias el tamaño)
   useEffect(() => {
@@ -22,14 +24,34 @@ export default function AdminLayout() {
     <div className="admin-shell">
       {/* Topbar */}
       <header className="admin-topbar">
-        <button className="icon-btn" onClick={toggleSidebar} aria-label="Menú">
+        <button
+          className="icon-btn"
+          onClick={toggleSidebar}
+          aria-label="Menú"
+        >
           ☰
         </button>
+
         <div className="admin-topbar__title">Admin</div>
+
         <div className="admin-topbar__spacer" />
-        <button className="btn" onClick={openSidebar}>
-          Abrir menú
-        </button>
+
+        {isAuthenticated && (
+          <div className="admin-topbar__right">
+            <span className="admin-user-label">
+              {user?.email || user?.name || "Usuario"}
+            </span>
+            <button className="btn" onClick={logout}>
+              Salir
+            </button>
+          </div>
+        )}
+
+        {!isAuthenticated && (
+          <button className="btn" onClick={openSidebar}>
+            Abrir menú
+          </button>
+        )}
       </header>
 
       {/* Overlay (móvil) */}
