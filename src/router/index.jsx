@@ -21,9 +21,8 @@ import EditarUsuario from "../pages/admin/EditarUsuario.jsx";
 
 import { useAuth } from "../context/AuthContext.jsx";
 
-// ---- ProtectedRoute ----
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+function ProtectedRoute({ children, roles = [] }) {
+  const { isAuthenticated, role } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
@@ -36,10 +35,13 @@ function ProtectedRoute({ children }) {
     );
   }
 
+  if (roles.length > 0 && !roles.includes(role)) {
+    return <Navigate to="/admin/inventario" replace />;
+  }
+
   return children;
 }
 
-// ---- Router ----
 export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
@@ -60,15 +62,16 @@ export const router = createBrowserRouter([
       {
         path: "inventario",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute roles={["admin", "staff"]}>
             <AdminInventario />
           </ProtectedRoute>
         ),
       },
+
       {
         path: "sucursales",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute roles={["admin"]}>
             <AdminSucursales />
           </ProtectedRoute>
         ),
@@ -77,7 +80,7 @@ export const router = createBrowserRouter([
       {
         path: "usuarios",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute roles={["admin"]}>
             <Usuarios />
           </ProtectedRoute>
         ),
@@ -85,7 +88,7 @@ export const router = createBrowserRouter([
       {
         path: "usuarios/:id",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute roles={["admin"]}>
             <EditarUsuario />
           </ProtectedRoute>
         ),

@@ -12,6 +12,7 @@ export default function EditarUsuario() {
   const [email, setEmail] = useState(user?.email || "");
   const [password, setPassword] = useState(user?.password || "");
   const [branchId, setBranchId] = useState(user?.branchId || BRANCHES[0]?.id || "");
+  const [role, setRole] = useState(user?.role === "admin" ? "admin" : "staff");
   const [error, setError] = useState("");
 
   if (!user) {
@@ -40,6 +41,7 @@ export default function EditarUsuario() {
       email: email.trim(),
       password, // demo
       branchId,
+      role,
     });
 
     if (!res.ok) return setError(res.error);
@@ -51,7 +53,9 @@ export default function EditarUsuario() {
     <section className="page">
       <div className="admin-header">
         <h1>Editar usuario</h1>
-        <p>ID: <code>{user.id}</code></p>
+        <p>
+          ID: <code>{user.id}</code>
+        </p>
       </div>
 
       <div className="admin-panel">
@@ -71,6 +75,14 @@ export default function EditarUsuario() {
           <label className="field">
             <span>Contraseña (demo)</span>
             <input value={password} onChange={(e) => setPassword(e.target.value)} type="text" />
+          </label>
+
+          <label className="field">
+            <span>Rol</span>
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="staff">staff</option>
+              <option value="admin">admin</option>
+            </select>
           </label>
 
           <label className="field">

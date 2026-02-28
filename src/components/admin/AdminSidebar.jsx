@@ -1,8 +1,12 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const linkClass = ({ isActive }) => `side-link ${isActive ? "is-active" : ""}`;
 
 export default function AdminSidebar({ isOpen, onClose }) {
+  const { role } = useAuth();
+  const isAdmin = role === "admin";
+
   return (
     <aside className={`admin-sidebar ${isOpen ? "is-open" : ""}`}>
       <div className="admin-sidebar__header">
@@ -23,12 +27,20 @@ export default function AdminSidebar({ isOpen, onClose }) {
           <NavLink to="/admin/inventario" className={linkClass}>
             Inventario
           </NavLink>
-          <NavLink to="/admin/sucursales" className={linkClass}>
-            Sucursales
-          </NavLink>
-          <NavLink to="/admin/usuarios" className={linkClass}>
-            Usuarios
-          </NavLink>
+
+          {/* ✅ SOLO ADMIN */}
+          {isAdmin && (
+            <NavLink to="/admin/sucursales" className={linkClass}>
+              Sucursales
+            </NavLink>
+          )}
+
+          {/* ✅ SOLO ADMIN */}
+          {isAdmin && (
+            <NavLink to="/admin/usuarios" className={linkClass}>
+              Usuarios
+            </NavLink>
+          )}
 
           <div className="side-divider" />
 

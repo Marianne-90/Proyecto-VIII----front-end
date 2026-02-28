@@ -12,6 +12,7 @@ export default function Usuarios() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("123456");
   const [newBranchId, setNewBranchId] = useState(BRANCHES[0]?.id || "");
+  const [newRole, setNewRole] = useState("staff");
   const [formError, setFormError] = useState("");
 
   const users = useMemo(() => {
@@ -27,13 +28,21 @@ export default function Usuarios() {
     if (!email.trim()) return setFormError("Email es requerido.");
     if (!newBranchId) return setFormError("Sucursal es requerida.");
 
-    const res = createUser({ name, email, password, branchId: newBranchId, role: "staff" });
+    const res = createUser({
+      name,
+      email,
+      password,
+      branchId: newBranchId,
+      role: newRole,
+    });
+
     if (!res.ok) return setFormError(res.error);
 
     setName("");
     setEmail("");
     setPassword("123456");
     setNewBranchId(BRANCHES[0]?.id || "");
+    setNewRole("staff");
     setRefreshKey((k) => k + 1);
   };
 
@@ -50,11 +59,10 @@ export default function Usuarios() {
     <section className="page">
       <div className="admin-header">
         <h1>Usuarios</h1>
-        <p>Crear, editar y asignar sucursal (demo con cookies).</p>
+        <p>Crear, editar y asignar sucursal (demo con cookies). Staff no tiene acceso.</p>
       </div>
 
       <div className="admin-grid">
-        {/* Panel: filtros + tabla */}
         <div className="admin-panel">
           <div className="admin-panel__header">
             <h2>Listado</h2>
@@ -120,7 +128,6 @@ export default function Usuarios() {
           </div>
         </div>
 
-        {/* Panel: crear usuario */}
         <div className="admin-panel">
           <div className="admin-panel__header">
             <h2>Crear usuario</h2>
@@ -152,6 +159,14 @@ export default function Usuarios() {
                 placeholder="123456"
                 type="text"
               />
+            </label>
+
+            <label className="field">
+              <span>Rol</span>
+              <select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
+                <option value="staff">staff</option>
+                <option value="admin">admin</option>
+              </select>
             </label>
 
             <label className="field">

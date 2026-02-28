@@ -56,7 +56,6 @@ function newId() {
 export function loadUsers() {
   const raw = getCookie(USERS_COOKIE);
   if (!raw) {
-    // Inicializar cookie con seed si no existe
     setCookie(USERS_COOKIE, JSON.stringify(SEED_USERS), 30);
     return [...SEED_USERS];
   }
@@ -93,6 +92,24 @@ export function getUserById(id) {
   return users.find((u) => u.id === id) || null;
 }
 
+/**
+ * Login dummy contra el store (cookies).
+ * En Laravel: POST /api/login -> session/token
+ */
+export function authenticateUser(email, password) {
+  const users = loadUsers();
+  const e = email.trim().toLowerCase();
+  const u = users.find((x) => x.email.trim().toLowerCase() === e);
+
+  if (!u) return { ok: false, error: "Usuario no existe." };
+  if ((u.password ?? "") !== (password ?? "")) {
+    return { ok: false, error: "Password incorrecta." };
+  }
+
+  // Importante: devolvemos user completo (demo). En prod no devolver password.
+  return { ok: true, user: u };
+}
+
 export function createUser({ name, email, password, branchId, role = "staff" }) {
   const users = loadUsers();
 
@@ -107,7 +124,7 @@ export function createUser({ name, email, password, branchId, role = "staff" }) 
     name: name.trim(),
     email: emailNormalized,
     password: password ?? "",
-    role,
+    role: role === "admin" ? "admin" : "staff",
     branchId,
     createdAt: now,
     updatedAt: now,
@@ -125,7 +142,6 @@ export function updateUser(id, patch) {
 
   const emailNormalized = patch.email ? patch.email.trim().toLowerCase() : null;
 
-  // Validación email único
   if (emailNormalized) {
     const taken = users.some(
       (u) => u.id !== id && u.email.trim().toLowerCase() === emailNormalized
@@ -134,13 +150,17 @@ export function updateUser(id, patch) {
   }
 
   const now = new Date().toISOString();
-  users[idx] = {
+  const next = {
     ...users[idx],
     ...patch,
     ...(emailNormalized ? { email: emailNormalized } : {}),
     updatedAt: now,
   };
 
+  // normalizar rol a admin/staff
+  if (next.role !== "admin") next.role = "staff";
+
+  users[idx] = next;
   saveUsers(users);
   return { ok: true, user: users[idx] };
 }

@@ -1,58 +1,83 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { deleteCookie, getCookie, setCookie } from "../services/cookies";
+import { authenticateUser, getUserById } from "../services/usersStore";
 
 const AuthContext = createContext(null);
+
+const AUTH_COOKIE = "demo_auth_v1";
+
+function safeParse(json, fallback) {
+  try {
+    const parsed = JSON.parse(json);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Cargar estado inicial desde localStorage
+  // Cargar sesión desde cookie
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const email = localStorage.getItem("user_email");
+    const raw = getCookie(AUTH_COOKIE);
+    const data = raw ? safeParse(raw, null) : null;
 
-    if (token && email) {
-      setUser({
-        name: "Admin Demo",
-        email,
-        token,
-      });
+    if (data?.userId) {
+      const u = getUserById(data.userId);
+      if (u) {
+        setUser({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,       // admin | staff
+          branchId: u.branchId,
+          token: data.token || "demo-token",
+        });
+      } else {
+        deleteCookie(AUTH_COOKIE);
+      }
     }
 
     setIsLoading(false);
   }, []);
 
-  // Dummy login: credenciales fijas
+  // Dummy login: email/password contra usersStore
   const login = ({ email, password }) => {
-    if (email === "admin@demo.com" && password === "123456") {
-      const fakeToken = "demo-token";
-
-      localStorage.setItem("token", fakeToken);
-      localStorage.setItem("user_email", email);
-
-      setUser({
-        name: "Admin Demo",
-        email,
-        token: fakeToken,
-      });
-
-      return { success: true };
+    const res = authenticateUser(email, password);
+    if (!res.ok) {
+      return { success: false, message: res.error };
     }
 
-    return {
-      success: false,
-      message: "Credenciales inválidas (usa admin@demo.com / 123456)",
-    };
+    const fakeToken = "demo-token";
+    setCookie(
+      AUTH_COOKIE,
+      JSON.stringify({ userId: res.user.id, token: fakeToken }),
+      30
+    );
+
+    setUser({
+      id: res.user.id,
+      name: res.user.name,
+      email: res.user.email,
+      role: res.user.role,
+      branchId: res.user.branchId,
+      token: fakeToken,
+    });
+
+    return { success: true };
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user_email");
+    deleteCookie(AUTH_COOKIE);
     setUser(null);
   };
 
   const value = {
     user,
+    role: user?.role || null,
+    branchId: user?.branchId || null,
     isAuthenticated: !!user,
     isLoading,
     login,
@@ -60,11 +85,7 @@ export function AuthProvider({ children }) {
   };
 
   if (isLoading) {
-    return (
-      <div className="loading-full">
-        Cargando sesión...
-      </div>
-    );
+    return <div className="loading-full">Cargando sesión...</div>;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -72,8 +93,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth debe usarse dentro de un <AuthProvider>");
-  }
+  if (!ctx) throw new Error("useAuth debe usarse dentro de un <AuthProvider>");
   return ctx;
 }
