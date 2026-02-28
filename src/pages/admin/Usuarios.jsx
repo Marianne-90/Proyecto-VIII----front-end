@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BRANCHES, branchName, createUser, deleteUser, listUsers } from "../../services/usersStore";
+import { listBranches, branchName } from "../../services/branchesStore";
+import { createUser, deleteUser, listUsers } from "../../services/usersStore";
 
 export default function Usuarios() {
   const [q, setQ] = useState("");
@@ -11,9 +12,11 @@ export default function Usuarios() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("123456");
-  const [newBranchId, setNewBranchId] = useState(BRANCHES[0]?.id || "");
   const [newRole, setNewRole] = useState("staff");
+  const [newBranchId, setNewBranchId] = useState("mx-roma");
   const [formError, setFormError] = useState("");
+
+  const branches = useMemo(() => listBranches(), []);
 
   const users = useMemo(() => {
     void refreshKey;
@@ -41,8 +44,8 @@ export default function Usuarios() {
     setName("");
     setEmail("");
     setPassword("123456");
-    setNewBranchId(BRANCHES[0]?.id || "");
     setNewRole("staff");
+    setNewBranchId(branches[0]?.id || "");
     setRefreshKey((k) => k + 1);
   };
 
@@ -59,7 +62,7 @@ export default function Usuarios() {
     <section className="page">
       <div className="admin-header">
         <h1>Usuarios</h1>
-        <p>Crear, editar y asignar sucursal (demo con cookies). Staff no tiene acceso.</p>
+        <p>Ahora las sucursales vienen de cookies (branchesStore).</p>
       </div>
 
       <div className="admin-grid">
@@ -75,7 +78,7 @@ export default function Usuarios() {
               />
               <select value={branchId} onChange={(e) => setBranchId(e.target.value)} aria-label="Sucursal">
                 <option value="">Todas las sucursales</option>
-                {BRANCHES.map((b) => (
+                {branches.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
                   </option>
@@ -172,7 +175,7 @@ export default function Usuarios() {
             <label className="field">
               <span>Sucursal</span>
               <select value={newBranchId} onChange={(e) => setNewBranchId(e.target.value)}>
-                {BRANCHES.map((b) => (
+                {branches.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
                   </option>

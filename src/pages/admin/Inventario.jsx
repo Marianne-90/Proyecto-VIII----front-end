@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { BRANCHES, branchName } from "../../services/usersStore";
+import { listBranches, branchName } from "../../services/branchesStore";
 
 export default function Inventario() {
   const { role, branchId: myBranchId } = useAuth();
   const isAdmin = role === "admin";
+
+  const branches = useMemo(() => listBranches(), []);
 
   // Admin puede filtrar; staff queda fijo
   const [selectedBranchId, setSelectedBranchId] = useState("");
@@ -31,7 +33,7 @@ export default function Inventario() {
               onChange={(e) => setSelectedBranchId(e.target.value)}
             >
               <option value="">Todas las sucursales</option>
-              {BRANCHES.map((b) => (
+              {branches.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
@@ -65,7 +67,7 @@ export default function Inventario() {
         <p>
           Aquí luego conectaremos a Laravel para traer productos por sucursal:
           <br />
-          <code>GET /api/inventario?branch_id=...</code>
+          <code>GET /api/products?branch_id=...</code>
         </p>
 
         <div className="admin-card" style={{ width: "100%" }}>

@@ -3,19 +3,8 @@ import { getCookie, setCookie } from "./cookies";
 const USERS_COOKIE = "demo_users_v1";
 
 /**
- * Sucursales dummy.
- * En Laravel: tabla branches/sucursales y relación users.branch_id
- */
-export const BRANCHES = [
-  { id: "mx-roma", name: "CDMX - Roma" },
-  { id: "mx-polanco", name: "CDMX - Polanco" },
-  { id: "gdl-centro", name: "GDL - Centro" },
-  { id: "mty-sanpedro", name: "MTY - San Pedro" },
-];
-
-/**
  * Seed inicial dummy.
- * En Laravel: usuarios en DB con password hash.
+ * branchId apunta a branchesStore (id = code).
  */
 const SEED_USERS = [
   {
@@ -92,10 +81,6 @@ export function getUserById(id) {
   return users.find((u) => u.id === id) || null;
 }
 
-/**
- * Login dummy contra el store (cookies).
- * En Laravel: POST /api/login -> session/token
- */
 export function authenticateUser(email, password) {
   const users = loadUsers();
   const e = email.trim().toLowerCase();
@@ -106,7 +91,6 @@ export function authenticateUser(email, password) {
     return { ok: false, error: "Password incorrecta." };
   }
 
-  // Importante: devolvemos user completo (demo). En prod no devolver password.
   return { ok: true, user: u };
 }
 
@@ -157,7 +141,6 @@ export function updateUser(id, patch) {
     updatedAt: now,
   };
 
-  // normalizar rol a admin/staff
   if (next.role !== "admin") next.role = "staff";
 
   users[idx] = next;
@@ -173,6 +156,8 @@ export function deleteUser(id) {
   return { ok: true };
 }
 
-export function branchName(branchId) {
-  return BRANCHES.find((b) => b.id === branchId)?.name || "—";
+/** ✅ Regla: cuántos usuarios pertenecen a una sucursal */
+export function countUsersByBranch(branchId) {
+  const users = loadUsers();
+  return users.filter((u) => u.branchId === branchId).length;
 }

@@ -1,17 +1,19 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BRANCHES, getUserById, updateUser } from "../../services/usersStore";
+import { listBranches } from "../../services/branchesStore";
+import { getUserById, updateUser } from "../../services/usersStore";
 
 export default function EditarUsuario() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const branches = useMemo(() => listBranches(), []);
   const user = useMemo(() => getUserById(id), [id]);
 
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [password, setPassword] = useState(user?.password || "");
-  const [branchId, setBranchId] = useState(user?.branchId || BRANCHES[0]?.id || "");
+  const [branchId, setBranchId] = useState(user?.branchId || branches[0]?.id || "");
   const [role, setRole] = useState(user?.role === "admin" ? "admin" : "staff");
   const [error, setError] = useState("");
 
@@ -88,7 +90,7 @@ export default function EditarUsuario() {
           <label className="field">
             <span>Sucursal</span>
             <select value={branchId} onChange={(e) => setBranchId(e.target.value)}>
-              {BRANCHES.map((b) => (
+              {branches.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
