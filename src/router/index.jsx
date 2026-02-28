@@ -16,6 +16,9 @@ import Contacto from "../pages/public/Contacto.jsx";
 import AdminLogin from "../pages/admin/Login.jsx";
 import AdminInventario from "../pages/admin/Inventario.jsx";
 import AdminSucursales from "../pages/admin/Sucursales.jsx";
+import Usuarios from "../pages/admin/Usuarios.jsx";
+import EditarUsuario from "../pages/admin/EditarUsuario.jsx";
+
 import { useAuth } from "../context/AuthContext.jsx";
 
 // ---- ProtectedRoute ----
@@ -51,14 +54,9 @@ export const router = createBrowserRouter([
     path: "/admin",
     element: <AdminLayout />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="/admin/login" replace />,
-      },
-      {
-        path: "login",
-        element: <AdminLogin />,
-      },
+      { index: true, element: <Navigate to="/admin/login" replace /> },
+      { path: "login", element: <AdminLogin /> },
+
       {
         path: "inventario",
         element: (
@@ -72,6 +70,23 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <AdminSucursales />
+          </ProtectedRoute>
+        ),
+      },
+
+      {
+        path: "usuarios",
+        element: (
+          <ProtectedRoute>
+            <Usuarios />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "usuarios/:id",
+        element: (
+          <ProtectedRoute>
+            <EditarUsuario />
           </ProtectedRoute>
         ),
       },

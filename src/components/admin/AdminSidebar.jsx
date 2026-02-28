@@ -26,6 +26,9 @@ export default function AdminSidebar({ isOpen, onClose }) {
           <NavLink to="/admin/sucursales" className={linkClass}>
             Sucursales
           </NavLink>
+          <NavLink to="/admin/usuarios" className={linkClass}>
+            Usuarios
+          </NavLink>
 
           <div className="side-divider" />
 
