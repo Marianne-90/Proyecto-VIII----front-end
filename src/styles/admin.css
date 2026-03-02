@@ -254,7 +254,7 @@
 }
 
 /* Desktop layout: sidebar fija (no overlay) */
-@media (min-width: 900px) {
+@media (min-width: 2000px) {
   .admin-overlay { display: none; }
 
   .admin-shell {

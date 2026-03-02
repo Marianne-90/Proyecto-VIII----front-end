@@ -1,22 +1,51 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "../components/admin/AdminSidebar.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+
+const DESKTOP_BREAKPOINT = 900;
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
 
-  // Cerrar sidebar al pasar a desktop (si cambias el tamaño)
+  // Cerrar sidebar al navegar (móvil / drawer)
+  useEffect(() => {
+    setIsSidebarOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // Cerrar sidebar al pasar a desktop
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth >= 900) setIsSidebarOpen(false);
+      if (window.innerWidth >= DESKTOP_BREAKPOINT) setIsSidebarOpen(false);
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const openSidebar = () => setIsSidebarOpen(true);
+  // Cerrar con ESC y bloquear scroll del body cuando está abierto en móvil
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setIsSidebarOpen(false);
+    };
+
+    const isMobile = window.innerWidth < DESKTOP_BREAKPOINT;
+    if (isSidebarOpen && isMobile) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", onKeyDown);
+    } else {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isSidebarOpen]);
+
   const closeSidebar = () => setIsSidebarOpen(false);
   const toggleSidebar = () => setIsSidebarOpen((v) => !v);
 
@@ -27,7 +56,7 @@ export default function AdminLayout() {
         <button
           className="icon-btn"
           onClick={toggleSidebar}
-          aria-label="Menú"
+          aria-label="Abrir/Cerrar menú"
         >
           ☰
         </button>
@@ -46,28 +75,20 @@ export default function AdminLayout() {
             </button>
           </div>
         )}
-
-        {!isAuthenticated && (
-          <button className="btn" onClick={openSidebar}>
-            Abrir menú
-          </button>
-        )}
       </header>
 
       {/* Overlay (móvil) */}
       <div
         className={`admin-overlay ${isSidebarOpen ? "is-open" : ""}`}
         onClick={closeSidebar}
-        role="button"
-        aria-label="Cerrar menú"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") closeSidebar();
-        }}
+        aria-hidden={!isSidebarOpen}
       />
 
       {/* Sidebar */}
-      <AdminSidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <AdminSidebar
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+      />
 
       {/* Content */}
       <main className="admin-main">
