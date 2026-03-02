@@ -16,14 +16,14 @@ export default function Navbar() {
           <NavLink to="/" className={linkClass} end>
             Home
           </NavLink>
-          <NavLink to="/menu" className={linkClass}>
+          <NavLink to="/carta" className={linkClass}>
             Menú
           </NavLink>
-          <NavLink to="/promos" className={linkClass}>
-            Promos
+          <NavLink to="/especialidades" className={linkClass}>
+            Especialidades
           </NavLink>
-          <NavLink to="/contacto" className={linkClass}>
-            Contacto
+          <NavLink  to="/reservar" id="navContacto" className={linkClass}>
+            Reserva y Contacto
           </NavLink>
           <NavLink to="/admin/login" className="navlink navlink--admin">
             Admin

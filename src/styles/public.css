@@ -71,8 +71,13 @@
 .navlink--admin {
   margin-left: 0.25rem;
   color: var(--text);
-  border-color: rgba(0, 0, 0, 0.08);
-  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.149);
+}
+
+#navContacto{
+   border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(154, 255, 77, 0.284);
 }
 
 .public-main {
@@ -215,7 +220,7 @@
 }
 
 /* Buttons (locales) */
-.btn {
+.btn, .pill  {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -230,13 +235,13 @@
   transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.btn:hover {
+.btn:hover, .pill:hover  {
   transform: translateY(-1px);
   background: var(--surface-2);
   border-color: rgba(255, 77, 77, 0.35);
 }
 
-.btn:disabled {
+.btn:disabled, .pill:disabled{
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;
@@ -372,4 +377,64 @@
 
 .contact__instagram:hover {
   color: var(--accent-2);
+}
+
+/* --- Media/Galería optimizada para fotos verticales --- */
+.contact__media {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+/* HERO + stack en desktop */
+@media (min-width: 900px) {
+  .contact__media {
+    grid-template-columns: 1.35fr 0.65fr;
+    align-items: stretch;
+  }
+}
+
+/* Cards */
+.media__hero,
+.media__item {
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+}
+
+.media__hero img,
+.media__item img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Alturas CONTROLADAS (evita “enorme”) */
+.media__hero { height: 320px; }
+.media__item { height: 150px; }
+
+/* Desktop: hero más alto y columna derecha con 3 iguales */
+@media (min-width: 900px) {
+  .media__hero { height: 520px; }
+  .media__item { height: 166px; }
+}
+
+.media__stack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+/* Pequeña mejora visual */
+.media__hero img,
+.media__item img {
+  transition: transform 400ms ease;
+}
+
+.media__hero:hover img,
+.media__item:hover img {
+  transform: scale(1.03);
 }

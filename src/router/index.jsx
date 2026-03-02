@@ -9,8 +9,7 @@ import PublicLayout from "../layouts/PublicLayout.jsx";
 import AdminLayout from "../layouts/AdminLayout.jsx";
 
 import Home from "../pages/public/Home.jsx";
-import Menu from "../pages/public/Menu.jsx";
-import Promos from "../pages/public/Promos.jsx";
+import Especialidades from "../pages/public/Especialidades.jsx";
 import Contacto from "../pages/public/Contacto.jsx";
 
 import AdminLogin from "../pages/admin/Login.jsx";
@@ -18,8 +17,12 @@ import AdminInventario from "../pages/admin/Inventario.jsx";
 import AdminSucursales from "../pages/admin/Sucursales.jsx";
 import Usuarios from "../pages/admin/Usuarios.jsx";
 import EditarUsuario from "../pages/admin/EditarUsuario.jsx";
+import Carta from "../pages/public/Carta.jsx";
+import Reservar from "../pages/public/Reservar.jsx";
 
 import { useAuth } from "../context/AuthContext.jsx";
+
+
 
 function ProtectedRoute({ children, roles = [] }) {
   const { isAuthenticated, role } = useAuth();
@@ -47,8 +50,9 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { path: "/", element: <Home /> },
-      { path: "/menu", element: <Menu /> },
-      { path: "/promos", element: <Promos /> },
+      { path: "/carta", element: <Carta /> },
+      { path: "/especialidades", element: <Especialidades /> },
+      { path: "/reservar", element: <Reservar /> },
       { path: "/contacto", element: <Contacto /> },
     ],
   },
