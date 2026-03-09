@@ -26,12 +26,17 @@
 * { box-sizing: border-box; }
 
 html, body {
-  height: 100%;
+  min-height: 100vh;
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
   background:
     radial-gradient(900px 520px at 10% 0%, rgba(255, 77, 77, 0.10) 0%, rgba(255, 255, 255, 1) 55%),
     linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* opcional */
+  
   color: var(--text);
 }
 

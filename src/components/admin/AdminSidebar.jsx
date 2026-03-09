@@ -42,14 +42,14 @@ export default function AdminSidebar({ isOpen, onClose }) {
                 Inventario
               </NavLink>
 
-              {/* ✅ SOLO ADMIN */}
+ 
               {isAdmin && (
                 <NavLink to="/admin/sucursales" className={linkClass}>
                   Sucursales
                 </NavLink>
               )}
 
-              {/* ✅ SOLO ADMIN */}
+
               {isAdmin && (
                 <NavLink to="/admin/usuarios" className={linkClass}>
                   Usuarios

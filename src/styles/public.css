@@ -18,8 +18,116 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.9rem 0;
+  padding: 0.3rem 0;
   gap: 1rem;
+  position: relative;
+}
+
+/* Botón hamburguesa: oculto en desktop */
+.nav-toggle {
+  display: none;
+  width: 42px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.nav-toggle:hover {
+  background: var(--surface-2);
+  border-color: rgba(255, 77, 77, 0.35);
+  transform: translateY(-1px);
+}
+
+.nav-toggle__bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 999px;
+}
+
+/* Overlay para móvil */
+.nav-overlay {
+  display: none;
+}
+
+/* --- MÓVIL/TABLET --- */
+@media (max-width: 860px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  /* El nav pasa a “panel” desplegable */
+  .nav {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: min(92vw, 340px);
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.6rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.12);
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 160ms ease, transform 160ms ease;
+    z-index: 30;
+  }
+
+  .nav.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* Links en vertical, estilo “botón” */
+  .navlink {
+    display: block;
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: transparent;
+  }
+
+  .navlink:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+    transform: none;
+  }
+
+  .navlink--admin {
+    margin-left: 0;
+  }
+
+  /* Overlay detrás del menú */
+  .nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+    z-index: 25;
+  }
+
+  .nav-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .brand {
@@ -437,4 +545,42 @@
 .media__hero:hover img,
 .media__item:hover img {
   transform: scale(1.03);
+}
+
+/* --- Brand con logo --- */
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand__link {
+  
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand__logo {
+  border-radius: 50%;
+  border: 1px solid rgba(255, 77, 77, 0.45);
+  height: 48px;       /* tamaño desktop */
+  width: auto;
+  display: block;
+  object-fit: contain;
+  transition: transform 200ms ease;
+}
+
+.brand__logo:hover {
+  transform: scale(1.05);
+}
+
+/* Móvil un poco más pequeño */
+@media (max-width: 860px) {
+  .brand__logo {
+    height: 38px;
+  }
+}
+
+.pizza{
+  color: var(--accent);
 }
