@@ -27,7 +27,7 @@ export default function Navbar() {
             <img src={logo} alt="La Nonnesa Pizza Party" className="brand__logo" />
           </NavLink>
           <span className="brand__dot" />
-          <span className="brand__name">La Nonnesa <span className="pizza">Pizza Party.</span></span>
+          <span className="brand__name">La Nonnesa <span className="pizza">Pizza Party</span></span>
         </div>
 
         {/* Botón móvil */}
@@ -45,7 +45,7 @@ export default function Navbar() {
         {/* Navegación */}
         <nav id="public-nav" className={`nav ${open ? "is-open" : ""}`}>
           <NavLink to="/" className={linkClass} end onClick={close}>
-            Home
+            Inicio
           </NavLink>
           <NavLink to="/carta" className={linkClass} onClick={close}>
             Menú
@@ -54,10 +54,10 @@ export default function Navbar() {
             Especialidades
           </NavLink>
           <NavLink to="/reservar" className={linkClass} onClick={close}>
-            Reserva y Contacto
+            Reservas
           </NavLink>
           <NavLink to="/admin/login" className="navlink navlink--admin" onClick={close}>
-            Admin
+            Acceso
           </NavLink>
         </nav>
       </div>
