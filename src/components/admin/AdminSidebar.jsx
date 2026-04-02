@@ -13,7 +13,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
       aria-hidden={!isOpen}
     >
       <div className="admin-sidebar__header">
-        <div className="admin-sidebar__title">Panel</div>
+        <div className="admin-sidebar__title">Gestión de la pizzería</div>
         <button className="icon-btn" onClick={onClose} aria-label="Cerrar">
           ✕
         </button>
@@ -25,11 +25,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
             <>
               <div className="side-section">Acceso</div>
               <NavLink to="/admin/login" className={linkClass}>
-                Login
+                Iniciar sesión
               </NavLink>
               <div className="side-divider" />
               <NavLink to="/" className="side-link side-link--muted">
-                ← Volver al sitio
+                ← Volver a la web
               </NavLink>
             </>
           )}
@@ -59,7 +59,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
               <div className="side-divider" />
 
               <NavLink to="/" className="side-link side-link--muted">
-                ← Volver al sitio
+                ← Volver a la web
               </NavLink>
             </>
           )}

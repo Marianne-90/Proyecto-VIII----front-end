@@ -61,7 +61,7 @@ export default function AdminLayout() {
           ☰
         </button>
 
-        <div className="admin-topbar__title">Admin</div>
+        <div className="admin-topbar__title">Panel de gestión</div>
 
         <div className="admin-topbar__spacer" />
 
@@ -71,7 +71,7 @@ export default function AdminLayout() {
               {user?.email || user?.name || "Usuario"}
             </span>
             <button className="btn" onClick={logout}>
-              Salir
+              Cerrar sesión
             </button>
           </div>
         )}

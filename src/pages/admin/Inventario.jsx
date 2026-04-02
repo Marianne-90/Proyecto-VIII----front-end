@@ -1,19 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { listBranches, branchName } from "../../services/branchesStore";
+import { getBranches } from "../../services/branchesApi";
 import {
-  createProduct,
-  deleteProduct,
-  listProducts,
-  listUniqueSkus,
-  updateProduct,
-} from "../../services/productsStore";
+  createProduct as createProductApi,
+  deleteProduct as deleteProductApi,
+  getProducts,
+  updateProduct as updateProductApi,
+} from "../../services/productsApi";
 
 export default function Inventario() {
   const { user, role, branchId: myBranchId } = useAuth();
   const isAdmin = role === "admin";
-
-  const branches = useMemo(() => listBranches(), []);
+  const [branches, setBranches] = useState([]);
+  const [branchesLoading, setBranchesLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState("");
 
   // Filtros
   const [q, setQ] = useState("");
@@ -25,13 +27,35 @@ export default function Inventario() {
   const [editing, setEditing] = useState(null); // null o {id,...}
   const [formError, setFormError] = useState("");
 
-  const actor = useMemo(() => {
-    return {
-      id: user?.id,
-      role,
-      branchId: myBranchId,
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadBranches() {
+      setBranchesLoading(true);
+
+      try {
+        const items = await getBranches();
+        if (!isMounted) return;
+        setBranches(items);
+      } catch (error) {
+        if (!isMounted) return;
+        setBranches([]);
+      } finally {
+        if (isMounted) setBranchesLoading(false);
+      }
+    }
+
+    loadBranches();
+
+    return () => {
+      isMounted = false;
     };
-  }, [user?.id, role, myBranchId]);
+  }, []);
+
+  const getBranchName = (branchId) => {
+    const branch = branches.find((item) => String(item.id) === String(branchId));
+    return branch?.name || "—";
+  };
 
   const effectiveBranchFilter = useMemo(() => {
     // staff: filtro forzado a su sucursal
@@ -39,20 +63,52 @@ export default function Inventario() {
     return filterBranchId;
   }, [isAdmin, filterBranchId, myBranchId]);
 
-  const products = useMemo(() => {
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProducts() {
+      setProductsLoading(true);
+      setProductsError("");
+
+      try {
+        const items = await getProducts({
+          q: q || undefined,
+          sku: filterSku || undefined,
+          branch_id: effectiveBranchFilter || undefined,
+        });
+
+        if (!isMounted) return;
+        setProducts(items);
+      } catch (error) {
+        if (!isMounted) return;
+        setProducts([]);
+        setProductsError(
+          error?.response?.data?.message || "No se pudieron cargar los productos."
+        );
+      } finally {
+        if (isMounted) setProductsLoading(false);
+      }
+    }
+
     void refreshKey;
-    return listProducts({
-      actor,
-      q,
-      branchId: effectiveBranchFilter,
-      sku: filterSku,
-    });
-  }, [actor, q, effectiveBranchFilter, filterSku, refreshKey]);
+    loadProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [q, filterSku, effectiveBranchFilter, refreshKey]);
 
   const skuOptions = useMemo(() => {
-    // SKU selector respeta el branch actual (admin puede filtrar por sucursal, staff está forzado)
-    return listUniqueSkus({ actor, branchId: effectiveBranchFilter });
-  }, [actor, effectiveBranchFilter, refreshKey]);
+    const map = new Map();
+
+    for (const product of products) {
+      if (!map.has(product.sku)) {
+        map.set(product.sku, { sku: product.sku, name: product.name });
+      }
+    }
+
+    return Array.from(map.values()).sort((a, b) => a.sku.localeCompare(b.sku));
+  }, [products]);
 
   const openCreate = () => {
     setFormError("");
@@ -89,7 +145,7 @@ export default function Inventario() {
     setFormError("");
   };
 
-  const onSave = (e) => {
+  const onSave = async (e) => {
     e.preventDefault();
     setFormError("");
 
@@ -104,45 +160,55 @@ export default function Inventario() {
       branchId: editing.branchId,
     };
 
-    const res =
-      editing.mode === "create"
-        ? createProduct(payload, { actor })
-        : updateProduct(editing.id, payload, { actor });
+    try {
+      if (editing.mode === "create") {
+        await createProductApi(payload);
+      } else {
+        await updateProductApi(editing.id, payload);
+      }
 
-    if (!res.ok) {
-      setFormError(res.error);
-      return;
+      setEditing(null);
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      const backendMessage = error?.response?.data?.message;
+      const validationErrors = error?.response?.data?.errors;
+      const firstValidationError = validationErrors
+        ? Object.values(validationErrors).flat()[0]
+        : null;
+
+      setFormError(
+        firstValidationError || backendMessage || "No se pudo guardar el producto."
+      );
     }
-
-    setEditing(null);
-    setRefreshKey((k) => k + 1);
   };
 
-  const onDelete = (p) => {
+  const onDelete = async (p) => {
     const ok = window.confirm(`¿Eliminar "${p.name}" (${p.sku})?`);
     if (!ok) return;
 
-    const res = deleteProduct(p.id, { actor });
-    if (!res.ok) {
-      alert(res.error);
-      return;
+    try {
+      await deleteProductApi(p.id);
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      alert(
+        error?.response?.data?.message || "No se pudo eliminar el producto."
+      );
     }
-    setRefreshKey((k) => k + 1);
   };
 
   return (
     <section className="page">
       <div className="admin-header">
-        <h1>Inventario / Productos</h1>
+        <h1>Inventario de productos</h1>
         <p>
           {isAdmin ? (
             <>
-              Rol <b>admin</b>: ves y gestionas todas las sucursales.
+              Como <b>administrador</b>, puedes consultar y gestionar los productos de todas las sucursales.
             </>
           ) : (
             <>
-              Rol <b>staff</b>: solo puedes gestionar tu sucursal:{" "}
-              <b>{branchName(myBranchId)}</b>
+              Como personal de tienda, solo puedes gestionar los productos de tu sucursal:{" "}
+              <b>{getBranchName(myBranchId)}</b>
             </>
           )}
         </p>
@@ -189,7 +255,7 @@ export default function Inventario() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Buscar (nombre, sku, descripción)…"
+                placeholder="Buscar por nombre, referencia o descripción…"
                 aria-label="Buscar texto"
               />
             </div>
@@ -197,7 +263,7 @@ export default function Inventario() {
 
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             <button className="btn" onClick={openCreate}>
-              + Nuevo producto
+              + Añadir producto
             </button>
 
             <button
@@ -212,16 +278,34 @@ export default function Inventario() {
             </button>
 
             <div style={{ marginLeft: "auto", color: "var(--muted)", fontSize: "0.9rem" }}>
-              Mostrando: <b>{products.length}</b>
+              Productos mostrados: <b>{products.length}</b>
             </div>
           </div>
+
+          {branchesLoading && (
+            <p style={{ marginTop: "0.75rem", color: "var(--muted)" }}>
+              Cargando las sucursales...
+            </p>
+          )}
+
+          {productsLoading && (
+            <p style={{ marginTop: "0.75rem", color: "var(--muted)" }}>
+              Cargando el inventario...
+            </p>
+          )}
+
+          {!productsLoading && productsError && (
+            <p className="error-text" style={{ marginTop: "0.75rem" }}>
+              {productsError || "No se ha podido cargar el inventario."}
+            </p>
+          )}
 
           <div className="table-wrap" style={{ marginTop: "0.75rem" }}>
             <table className="table">
               <thead>
                 <tr>
                   <th>Producto</th>
-                  <th>SKU</th>
+                  <th>Referencia</th>
                   <th>Precio</th>
                   <th>Stock</th>
                   <th>Sucursal</th>
@@ -229,10 +313,10 @@ export default function Inventario() {
                 </tr>
               </thead>
               <tbody>
-                {products.length === 0 && (
+                {!productsLoading && !productsError && products.length === 0 && (
                   <tr>
                     <td colSpan="6" style={{ color: "var(--muted)" }}>
-                      No hay productos que coincidan con los filtros.
+                      No hay productos que coincidan con la búsqueda actual.
                     </td>
                   </tr>
                 )}
@@ -252,7 +336,7 @@ export default function Inventario() {
                     </td>
                     <td>${Number(p.price).toFixed(2)}</td>
                     <td>{p.stock}</td>
-                    <td>{branchName(p.branchId)}</td>
+                    <td>{getBranchName(p.branchId)}</td>
                     <td className="col-actions">
                       <button className="btn btn--small" onClick={() => openEdit(p)}>
                         Editar
@@ -271,12 +355,12 @@ export default function Inventario() {
         {/* EDITOR */}
         <div className="admin-panel">
           <div className="admin-panel__header">
-            <h2>{editing ? (editing.mode === "create" ? "Crear producto" : "Editar producto") : "Editor"}</h2>
+            <h2>{editing ? (editing.mode === "create" ? "Añadir producto" : "Editar producto") : "Detalle del producto"}</h2>
           </div>
 
           {!editing && (
             <p style={{ color: "var(--muted)" }}>
-              Selecciona “Nuevo producto” o “Editar” en un producto para empezar.
+              Selecciona “Añadir producto” o edita uno existente para empezar.
             </p>
           )}
 
@@ -290,16 +374,16 @@ export default function Inventario() {
                   <input
                     value={editing.name}
                     onChange={(e) => setEditing((v) => ({ ...v, name: e.target.value }))}
-                    placeholder="Ej. Tacos al pastor"
+                    placeholder="Ej. Pizza barbacoa"
                   />
                 </label>
 
                 <label className="field">
-                  <span>SKU</span>
+                  <span>Referencia</span>
                   <input
                     value={editing.sku}
                     onChange={(e) => setEditing((v) => ({ ...v, sku: e.target.value }))}
-                    placeholder="Ej. TAC-PAST"
+                    placeholder="Ej. PIZ-BARB"
                   />
                 </label>
 
@@ -308,7 +392,7 @@ export default function Inventario() {
                   <input
                     value={editing.description}
                     onChange={(e) => setEditing((v) => ({ ...v, description: e.target.value }))}
-                    placeholder="Opcional"
+                    placeholder="Ingredientes o notas del producto"
                   />
                 </label>
 
@@ -347,7 +431,7 @@ export default function Inventario() {
                         </option>
                       ))
                     ) : (
-                      <option value={myBranchId}>{branchName(myBranchId)}</option>
+                      <option value={myBranchId}>{getBranchName(myBranchId)}</option>
                     )}
                   </select>
                 </label>
@@ -362,7 +446,7 @@ export default function Inventario() {
                 </div>
 
                 <p style={{ color: "var(--muted)", fontSize: "0.9rem", marginTop: "0.5rem" }}>
-                  Nota: validaciones y permisos se aplican también en el store (dummy) para simular backend.
+                  Los productos se gestionan directamente desde el sistema principal de la pizzería.
                 </p>
               </form>
             </>

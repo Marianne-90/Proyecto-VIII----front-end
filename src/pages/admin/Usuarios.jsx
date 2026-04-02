@@ -1,29 +1,71 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { listBranches, branchName } from "../../services/branchesStore";
-import { createUser, deleteUser, listUsers } from "../../services/usersStore";
+import { getBranches } from "../../services/branchesApi";
+import { createUser, deleteUser, getUsers } from "../../services/usersApi";
 
 export default function Usuarios() {
   const [q, setQ] = useState("");
   const [branchId, setBranchId] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [branches, setBranches] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   // Form crear usuario
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("123456");
+  const [password, setPassword] = useState("");
   const [newRole, setNewRole] = useState("staff");
-  const [newBranchId, setNewBranchId] = useState("mx-roma");
+  const [newBranchId, setNewBranchId] = useState("");
   const [formError, setFormError] = useState("");
 
-  const branches = useMemo(() => listBranches(), []);
+  useEffect(() => {
+    let isMounted = true;
 
-  const users = useMemo(() => {
+    async function loadData() {
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        const [branchItems, userItems] = await Promise.all([
+          getBranches(),
+          getUsers({
+            q: q || undefined,
+            branch_id: branchId || undefined,
+          }),
+        ]);
+
+        if (!isMounted) return;
+
+        setBranches(branchItems);
+        setUsers(userItems);
+        setNewBranchId((current) => current || branchItems[0]?.id || "");
+      } catch (error) {
+        if (!isMounted) return;
+        setLoadError(
+          error?.response?.data?.message || "No se ha podido cargar el personal."
+        );
+        setUsers([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
     void refreshKey;
-    return listUsers({ q, branchId });
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [q, branchId, refreshKey]);
 
-  const onCreate = (e) => {
+  const getBranchName = (id) => {
+    const branch = branches.find((item) => String(item.id) === String(id));
+    return branch?.name || "—";
+  };
+
+  const onCreate = async (e) => {
     e.preventDefault();
     setFormError("");
 
@@ -31,38 +73,53 @@ export default function Usuarios() {
     if (!email.trim()) return setFormError("Email es requerido.");
     if (!newBranchId) return setFormError("Sucursal es requerida.");
 
-    const res = createUser({
-      name,
-      email,
-      password,
-      branchId: newBranchId,
-      role: newRole,
-    });
+    try {
+      await createUser({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        branchId: newBranchId,
+        role: newRole,
+      });
 
-    if (!res.ok) return setFormError(res.error);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setNewRole("staff");
+      setNewBranchId(branches[0]?.id || "");
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      const backendMessage = error?.response?.data?.message;
+      const validationErrors = error?.response?.data?.errors;
+      const firstValidationError = validationErrors
+        ? Object.values(validationErrors).flat()[0]
+        : null;
 
-    setName("");
-    setEmail("");
-    setPassword("123456");
-    setNewRole("staff");
-    setNewBranchId(branches[0]?.id || "");
-    setRefreshKey((k) => k + 1);
+      setFormError(
+        firstValidationError || backendMessage || "No se pudo crear el usuario."
+      );
+    }
   };
 
-  const onDelete = (id, emailToShow) => {
+  const onDelete = async (id, emailToShow) => {
     const ok = window.confirm(`¿Eliminar usuario ${emailToShow}?`);
     if (!ok) return;
 
-    const res = deleteUser(id);
-    if (!res.ok) alert(res.error);
-    setRefreshKey((k) => k + 1);
+    try {
+      await deleteUser(id);
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      alert(
+        error?.response?.data?.message || "No se pudo eliminar el usuario."
+      );
+    }
   };
 
   return (
     <section className="page">
       <div className="admin-header">
         <h1>Usuarios</h1>
-        <p>Ahora las sucursales vienen de cookies (branchesStore).</p>
+        <p>Gestiona el personal y los accesos del panel de la pizzería.</p>
       </div>
 
       <div className="admin-grid">
@@ -73,7 +130,7 @@ export default function Usuarios() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Buscar por nombre/email…"
+                placeholder="Buscar por nombre o correo electrónico…"
                 aria-label="Buscar"
               />
               <select value={branchId} onChange={(e) => setBranchId(e.target.value)} aria-label="Sucursal">
@@ -99,10 +156,26 @@ export default function Usuarios() {
                 </tr>
               </thead>
               <tbody>
-                {users.length === 0 && (
+                {loading && (
                   <tr>
                     <td colSpan="5" style={{ color: "var(--muted)" }}>
-                      No hay usuarios que coincidan.
+                      Cargando el personal...
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && loadError && (
+                  <tr>
+                    <td colSpan="5" className="error-text">
+                      {loadError}
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && !loadError && users.length === 0 && (
+                  <tr>
+                    <td colSpan="5" style={{ color: "var(--muted)" }}>
+                      No hay personal que coincida con la búsqueda.
                     </td>
                   </tr>
                 )}
@@ -111,8 +184,8 @@ export default function Usuarios() {
                   <tr key={u.id}>
                     <td>{u.name}</td>
                     <td>{u.email}</td>
-                    <td>{branchName(u.branchId)}</td>
-                    <td>{u.role || "staff"}</td>
+                    <td>{getBranchName(u.branchId)}</td>
+                    <td>{u.role === "admin" ? "Administrador" : "Personal"}</td>
                     <td className="col-actions">
                       <Link className="btn btn--small" to={`/admin/usuarios/${u.id}`}>
                         Editar
@@ -141,7 +214,7 @@ export default function Usuarios() {
           <form className="form" onSubmit={onCreate}>
             <label className="field">
               <span>Nombre</span>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Juan Pérez" />
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Marta García" />
             </label>
 
             <label className="field">
@@ -149,26 +222,26 @@ export default function Usuarios() {
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="usuario@demo.com"
+                placeholder="empleado@pizzeria.es"
                 type="email"
               />
             </label>
 
             <label className="field">
-              <span>Contraseña (demo)</span>
+              <span>Contraseña</span>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="123456"
-                type="text"
+                placeholder="Mínimo 6 caracteres"
+                type="password"
               />
             </label>
 
             <label className="field">
-              <span>Rol</span>
+              <span>Perfil</span>
               <select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
-                <option value="staff">staff</option>
-                <option value="admin">admin</option>
+                <option value="staff">Personal</option>
+                <option value="admin">Administrador</option>
               </select>
             </label>
 

@@ -1,77 +1,102 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { deleteCookie, getCookie, setCookie } from "../services/cookies";
-import { authenticateUser, getUserById } from "../services/usersStore";
+import {
+  clearAuthToken,
+  getAuthToken,
+  http,
+  setAuthToken,
+} from "../services/http";
 
 const AuthContext = createContext(null);
 
-const AUTH_COOKIE = "demo_auth_v1";
+function normalizeUser(user) {
+  if (!user) return null;
 
-function safeParse(json, fallback) {
-  try {
-    const parsed = JSON.parse(json);
-    return parsed ?? fallback;
-  } catch {
-    return fallback;
-  }
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    branchId: user.branch_id ?? null,
+    branch: user.branch ?? null,
+  };
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Cargar sesión desde cookie
   useEffect(() => {
-    const raw = getCookie(AUTH_COOKIE);
-    const data = raw ? safeParse(raw, null) : null;
+    let isMounted = true;
 
-    if (data?.userId) {
-      const u = getUserById(data.userId);
-      if (u) {
-        setUser({
-          id: u.id,
-          name: u.name,
-          email: u.email,
-          role: u.role,       // admin | staff
-          branchId: u.branchId,
-          token: data.token || "demo-token",
-        });
-      } else {
-        deleteCookie(AUTH_COOKIE);
+    async function restoreSession() {
+      const token = getAuthToken();
+
+      if (!token) {
+        if (isMounted) setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await http.get("/me");
+        if (!isMounted) return;
+        setUser(normalizeUser(data));
+      } catch (error) {
+        clearAuthToken();
+        if (isMounted) setUser(null);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     }
 
-    setIsLoading(false);
+    restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Dummy login: email/password contra usersStore
-  const login = ({ email, password }) => {
-    const res = authenticateUser(email, password);
-    if (!res.ok) {
-      return { success: false, message: res.error };
+  const login = async ({ email, password }) => {
+    try {
+      const { data } = await http.post("/login", { email, password });
+      const nextUser = normalizeUser(data.user);
+
+      setAuthToken(data.token);
+      setUser(nextUser);
+
+      return { success: true };
+    } catch (error) {
+      clearAuthToken();
+      setUser(null);
+
+      return {
+        success: false,
+        message:
+          error?.response?.data?.message || "No se ha podido iniciar sesión.",
+      };
     }
-
-    const fakeToken = "demo-token";
-    setCookie(
-      AUTH_COOKIE,
-      JSON.stringify({ userId: res.user.id, token: fakeToken }),
-      30
-    );
-
-    setUser({
-      id: res.user.id,
-      name: res.user.name,
-      email: res.user.email,
-      role: res.user.role,
-      branchId: res.user.branchId,
-      token: fakeToken,
-    });
-
-    return { success: true };
   };
 
-  const logout = () => {
-    deleteCookie(AUTH_COOKIE);
-    setUser(null);
+  const logout = async () => {
+    try {
+      if (getAuthToken()) {
+        await http.post("/logout");
+      }
+    } catch (error) {
+      const status = error?.response?.status;
+      if (status !== 401) {
+        console.error("No se pudo cerrar sesión en el backend", error);
+      }
+    } finally {
+      clearAuthToken();
+      setUser(null);
+    }
+  };
+
+  const refreshUser = async () => {
+    const { data } = await http.get("/me");
+    const nextUser = normalizeUser(data);
+    setUser(nextUser);
+    return nextUser;
   };
 
   const value = {
@@ -82,10 +107,11 @@ export function AuthProvider({ children }) {
     isLoading,
     login,
     logout,
+    refreshUser,
   };
 
   if (isLoading) {
-    return <div className="loading-full">Cargando sesión...</div>;
+    return <div className="loading-full">Comprobando tu sesión...</div>;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

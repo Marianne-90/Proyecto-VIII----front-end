@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function Login() {
-  const [email, setEmail] = useState("admin@demo.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,31 +19,27 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
 
-    const result = login({ email, password });
-
+    const result = await login({ email, password });
     setSubmitting(false);
 
     if (result.success) {
       const from = location.state?.from || "/admin/inventario";
       navigate(from, { replace: true });
     } else {
-      setError(result.message || "Error al iniciar sesión");
+      setError(result.message || "No se ha podido iniciar sesión.");
     }
   };
 
   return (
     <section className="page">
       <div className="admin-card">
-        <h1>Admin Login</h1>
-        <p>Autenticación de prueba con credenciales fijas.</p>
-        <p style={{ fontSize: "0.9rem", opacity: 0.8 }}>
-          Email: <code>admin@demo.com</code> — Password: <code>123456</code>
-        </p>
+        <h1>Acceso al panel</h1>
+        <p>Inicia sesión para gestionar productos, usuarios y sucursales de la pizzería.</p>
 
         {error && (
           <p style={{ color: "#ff6b6b", marginTop: "0.75rem" }}>
@@ -56,7 +52,7 @@ export default function Login() {
             <span>Email</span>
             <input
               type="email"
-              placeholder="admin@demo.com"
+              placeholder="tu-correo@pizzeria.es"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"
@@ -64,10 +60,10 @@ export default function Login() {
           </label>
 
           <label className="field">
-            <span>Password</span>
+            <span>Contraseña</span>
             <input
               type="password"
-              placeholder="••••••••"
+              placeholder="Introduce tu contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
@@ -75,7 +71,7 @@ export default function Login() {
           </label>
 
           <button className="btn" type="submit" disabled={submitting}>
-            {submitting ? "Ingresando..." : "Ingresar"}
+            {submitting ? "Accediendo..." : "Entrar"}
           </button>
         </form>
       </div>

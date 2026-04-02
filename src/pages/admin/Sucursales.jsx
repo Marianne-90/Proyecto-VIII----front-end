@@ -1,15 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createBranch,
   deleteBranch,
-  listBranches,
+  getBranches,
   updateBranch,
-} from "../../services/branchesStore";
-import { countUsersByBranch } from "../../services/usersStore";
+} from "../../services/branchesApi";
+import { getUsers } from "../../services/usersApi";
 
 export default function Sucursales() {
   const [q, setQ] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [branches, setBranches] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   // create form
   const [name, setName] = useState("");
@@ -20,24 +24,72 @@ export default function Sucursales() {
   const [editing, setEditing] = useState(null); // {id, name, code}
   const [editError, setEditError] = useState("");
 
-  const branches = useMemo(() => {
-    void refreshKey;
-    return listBranches({ q });
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadBranches() {
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        const [items, userItems] = await Promise.all([getBranches(), getUsers()]);
+        if (!isMounted) return;
+
+        const query = q.trim().toLowerCase();
+        const filtered = items.filter((branch) => {
+          if (!query) return true;
+          return (
+            branch.name?.toLowerCase().includes(query) ||
+            branch.code?.toLowerCase().includes(query) ||
+            String(branch.id).toLowerCase().includes(query)
+          );
+        });
+
+        setBranches(filtered);
+        setUsers(userItems);
+      } catch (error) {
+        if (!isMounted) return;
+        setLoadError(
+          error?.response?.data?.message || "No se han podido cargar las sucursales."
+        );
+        setBranches([]);
+        setUsers([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadBranches();
+
+    return () => {
+      isMounted = false;
+    };
   }, [q, refreshKey]);
 
-  const onCreate = (e) => {
+  const onCreate = async (e) => {
     e.preventDefault();
     setFormError("");
 
-    const res = createBranch({ name, code });
-    if (!res.ok) {
-      setFormError(res.error);
-      return;
-    }
+    try {
+      await createBranch({
+        name: name.trim(),
+        code: code.trim(),
+      });
 
-    setName("");
-    setCode("");
-    setRefreshKey((k) => k + 1);
+      setName("");
+      setCode("");
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      const backendMessage = error?.response?.data?.message;
+      const validationErrors = error?.response?.data?.errors;
+      const firstValidationError = validationErrors
+        ? Object.values(validationErrors).flat()[0]
+        : null;
+
+      setFormError(
+        firstValidationError || backendMessage || "No se pudo crear la sucursal."
+      );
+    }
   };
 
   const startEdit = (b) => {
@@ -50,40 +102,54 @@ export default function Sucursales() {
     setEditError("");
   };
 
-  const saveEdit = (e) => {
+  const saveEdit = async (e) => {
     e.preventDefault();
     setEditError("");
 
-    const res = updateBranch(editing.id, { name: editing.name, code: editing.code });
-    if (!res.ok) {
-      setEditError(res.error);
-      return;
-    }
+    try {
+      await updateBranch(editing.id, {
+        name: editing.name.trim(),
+        code: editing.code.trim(),
+      });
 
-    setEditing(null);
-    setRefreshKey((k) => k + 1);
+      setEditing(null);
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      const backendMessage = error?.response?.data?.message;
+      const validationErrors = error?.response?.data?.errors;
+      const firstValidationError = validationErrors
+        ? Object.values(validationErrors).flat()[0]
+        : null;
+
+      setEditError(
+        firstValidationError || backendMessage || "No se pudo actualizar la sucursal."
+      );
+    }
   };
 
-  const onDelete = (b) => {
-    const usersCount = countUsersByBranch(b.id);
-    if (usersCount > 0) {
-      alert(`No puedes eliminar "${b.name}" porque tiene ${usersCount} usuario(s) asociados.`);
-      return;
-    }
-
+  const onDelete = async (b) => {
     const ok = window.confirm(`¿Eliminar sucursal "${b.name}"?`);
     if (!ok) return;
 
-    const res = deleteBranch(b.id);
-    if (!res.ok) alert(res.error);
-    setRefreshKey((k) => k + 1);
+    try {
+      await deleteBranch(b.id);
+      setRefreshKey((k) => k + 1);
+    } catch (error) {
+      alert(
+        error?.response?.data?.message || "No se pudo eliminar la sucursal."
+      );
+    }
+  };
+
+  const countUsersByBranch = (branchId) => {
+    return users.filter((user) => String(user.branchId) === String(branchId)).length;
   };
 
   return (
     <section className="page">
       <div className="admin-header">
         <h1>Sucursales</h1>
-        <p>CRUD dummy en cookies. Regla: no se puede eliminar si hay usuarios asociados.</p>
+        <p>Gestiona las sucursales desde las que opera la pizzería.</p>
       </div>
 
       <div className="admin-grid">
@@ -95,7 +161,7 @@ export default function Sucursales() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Buscar por nombre/código…"
+                placeholder="Buscar por nombre o código…"
                 aria-label="Buscar sucursal"
               />
             </div>
@@ -112,17 +178,32 @@ export default function Sucursales() {
                 </tr>
               </thead>
               <tbody>
-                {branches.length === 0 && (
+                {loading && (
                   <tr>
                     <td colSpan="4" style={{ color: "var(--muted)" }}>
-                      No hay sucursales.
+                      Cargando las sucursales...
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && loadError && (
+                  <tr>
+                    <td colSpan="4" className="error-text">
+                      {loadError}
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && !loadError && branches.length === 0 && (
+                  <tr>
+                    <td colSpan="4" style={{ color: "var(--muted)" }}>
+                      No hay sucursales que coincidan con la búsqueda actual.
                     </td>
                   </tr>
                 )}
 
                 {branches.map((b) => {
                   const usersCount = countUsersByBranch(b.id);
-                  const cantDelete = usersCount > 0;
 
                   return (
                     <tr key={b.id}>
@@ -138,12 +219,7 @@ export default function Sucursales() {
                         <button
                           className="btn btn--small btn--danger"
                           onClick={() => onDelete(b)}
-                          disabled={cantDelete}
-                          title={
-                            cantDelete
-                              ? "No se puede eliminar: hay usuarios asociados"
-                              : "Eliminar sucursal"
-                          }
+                          title="Eliminar sucursal"
                         >
                           Eliminar
                         </button>
@@ -156,7 +232,7 @@ export default function Sucursales() {
           </div>
 
           <p style={{ marginTop: "0.75rem", color: "var(--muted)" }}>
-            Tip: si quieres eliminar una sucursal, primero reasigna o elimina sus usuarios.
+            El número de usuarios se calcula a partir del listado real del personal asignado a cada sucursal.
           </p>
         </div>
 
@@ -173,7 +249,7 @@ export default function Sucursales() {
               <form className="form" onSubmit={onCreate}>
                 <label className="field">
                   <span>Nombre</span>
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. CDMX - Sur" />
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Madrid Centro" />
                 </label>
 
                 <label className="field">
@@ -181,7 +257,7 @@ export default function Sucursales() {
                   <input
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    placeholder="Ej. mx-sur (si lo dejas vacío se genera desde el nombre)"
+                    placeholder="Ej. MAD-CENTRO"
                   />
                 </label>
 
@@ -199,7 +275,7 @@ export default function Sucursales() {
               </div>
 
               <p style={{ marginTop: 0, color: "var(--muted)" }}>
-                ID (fijo): <code>{editing.id}</code>
+                Identificador: <code>{editing.id}</code>
               </p>
 
               {editError && <p className="error-text">{editError}</p>}
