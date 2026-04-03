@@ -119,7 +119,7 @@
 
 .side-link {
   padding: 0.55rem 0.65rem;
-  border-radius: 10px;
+  border-radius: 6px;
   border: 1px solid transparent;
   color: var(--muted);
   background: transparent;
@@ -204,7 +204,7 @@
 .table-wrap {
   overflow: auto;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 6px;
   background: #ffffff;
 }
 
@@ -239,7 +239,7 @@
 
 .btn--small {
   padding: 0.45rem 0.6rem;
-  border-radius: 10px;
+  border-radius: 6px;
   margin-right: 0.35rem;
 }
 

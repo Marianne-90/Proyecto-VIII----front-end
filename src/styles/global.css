@@ -10,6 +10,42 @@
   --text: #1f2328;
   --muted: #6b7280;
   --border: #e5e7eb;
+  --paper-warm-top: rgb(255, 255, 255);
+  --paper-warm-bottom: #fafaf9cb;
+  --paper-warm: linear-gradient(180deg, var(--paper-warm-top), var(--paper-warm-bottom));
+  --paper-warm-soft: rgba(252, 252, 252, 0.95);
+  --paper-warm-soft-2: rgba(255, 255, 255, 0.94);
+  --paper-warm-badge: rgba(255, 255, 255, 0.92);
+  --menu-card-tint: linear-gradient(90deg, rgba(140, 74, 45, 0.1), transparent 18%);
+  --menu-note-accent: linear-gradient(180deg, rgba(255, 243, 232, 0.98), rgba(255, 236, 221, 0.96));
+  --menu-service-band: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.9));
+  --menu-legend: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.96));
+  --menu-link-soft: rgba(255, 248, 242, 0.98);
+  --menu-link-soft-border: rgba(119, 118, 118, 0.14);
+  --menu-filter-active: rgba(255, 238, 226, 0.96);
+  --menu-filter-mode-active: rgba(123, 45, 23, 0.1);
+  --menu-note-link-bg: rgba(123, 45, 23, 0.08);
+  --menu-note-link-border: rgba(123, 45, 23, 0.18);
+  --menu-tag-bg: rgba(255, 77, 77, 0.10);
+  --menu-tag-border: rgba(255, 77, 77, 0.18);
+  --menu-allergen-chip-bg: rgba(255, 255, 255, 0.92);
+  --menu-allergen-chip-border: rgba(116, 34, 17, 0.10);
+  --menu-allergen-legend-chip-bg: rgba(255, 252, 248, 0.92);
+  --menu-legend-eyebrow: #a14f2b;
+  --menu-cta-panel: linear-gradient(135deg, rgba(255, 244, 235, 0.96), rgba(255, 235, 217, 0.94));
+  --menu-cta-panel-glow: radial-gradient(circle at top right, rgba(196, 94, 36, 0.18), transparent 48%);
+  --menu-cta-primary-bg: #7b2d17;
+  --menu-cta-primary-border: #7b2d17;
+  --menu-cta-primary-text: #fffaf5;
+  --menu-cta-primary-hover-bg: #662211;
+  --menu-cta-primary-hover-border: #662211;
+  --menu-link-soft-hover-border: rgba(116, 34, 17, 0.24);
+  --location-panel-bg: var(--paper-warm);
+  --location-link-bg: rgba(255, 245, 236, 0.92);
+  --location-link-hover-bg: rgba(255, 239, 227, 0.98);
+  --location-link-border: rgba(116, 34, 17, 0.18);
+  --location-link-hover-border: rgba(116, 34, 17, 0.35);
+  --location-eyebrow: #8f4a2d;
 
   /* Acento rojo */
   --accent: #ff4d4d;
@@ -87,7 +123,7 @@ p {
   background: var(--surface);
   color: var(--text);
   padding: 0.55rem 0.85rem;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
   transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -115,7 +151,7 @@ p {
   color: var(--text);
   width: 40px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -162,7 +198,7 @@ input {
   background: var(--surface);
   color: var(--text);
   padding: 0.6rem 0.7rem;
-  border-radius: 10px;
+  border-radius: 6px;
   outline: none;
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }

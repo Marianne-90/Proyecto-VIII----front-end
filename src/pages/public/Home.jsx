@@ -91,7 +91,7 @@ export default function Home() {
                 <img src={img2} alt="Pizza artesanal preparada para un evento" loading="lazy" />
               </figure>
               <div className="editorial-card__body">
-                <span className="editorial-card__kicker">Entrada destacada</span>
+                <span className="editorial-card__kicker">Nosotros</span>
                 <h3>Auténtica pizza italiana allí donde haya una celebración</h3>
                 <p>
                   Nos enorgullece preparar pizzas con una base artesanal, salsas cuidadas e ingredientes italianos
@@ -102,7 +102,7 @@ export default function Home() {
                   propuesta para convertir ese encuentro en algo todavía más especial.
                 </p>
                 <a href="/contacto" className="editorial-card__link">
-                  Leer más
+                  Contacto
                 </a>
               </div>
             </article>
