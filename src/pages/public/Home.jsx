@@ -66,6 +66,9 @@ export default function Home() {
           </div>
 
           <aside className="editorial-home__story-card">
+            <figure className="editorial-home__story-card-media">
+              <img src={img2} alt="Pizza italiana servida en mesa" loading="lazy" />
+            </figure>
             <h3>Lo que define a La Nonnesa</h3>
             <ul className="editorial-home__list">
               <li>Recetas inspiradas en la tradición italiana</li>
