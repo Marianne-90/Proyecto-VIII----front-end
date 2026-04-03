@@ -30,15 +30,23 @@ html, body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-  background:
-    radial-gradient(900px 520px at 10% 0%, rgba(255, 77, 77, 0.10) 0%, rgba(255, 255, 255, 1) 55%),
-    linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+  background-image:
+    radial-gradient(2000px 800px at 0% 0%, rgba(243, 131, 131, 0.626) 5%, rgba(255, 255, 255, 1) 50%),
+    url("/src/assets/banner.png");
 
-  background-repeat: no-repeat;
-  background-attachment: fixed; /* opcional */
-  
+  background-repeat: no-repeat, no-repeat;
+
+  /* gradiente | SVG */
+  background-position: top, right -200px top 40px;
+
+  background-size: auto, 3000px;
+  background-attachment: fixed, fixed;
+
   color: var(--text);
+  cursor: url('https://cdn.cursors-4u.net/previews/pizza-ffaca5fe-32.webp') 32 32, auto !important;
 }
+
+
 
 /* Links */
 a {
