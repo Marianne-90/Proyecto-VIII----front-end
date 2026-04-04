@@ -296,7 +296,7 @@ html {
 .contact__form,
 .contact__pitch {
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.085);
   background: var(--paper-warm);
   box-shadow: none;
 }
@@ -726,7 +726,7 @@ html {
   margin-top: 1.6rem;
   padding: 1.35rem;
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   background: var(--paper-warm);
   box-shadow: none;
   position: relative;
@@ -792,7 +792,7 @@ html {
 .contact .location-section__copy,
 .contact .location-section__map {
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.69), rgba(255, 246, 239, 0.492));
   box-shadow: none;
 }
@@ -935,10 +935,10 @@ html {
 .editorial-home__story-copy,
 .editorial-home__story-card,
 .editorial-home__quote-copy,
-.editorial-card,
+.editorial-home__grid,
 .editorial-home__section-head {
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   background: var(--paper-warm);
   box-shadow: none;
 }
@@ -1070,7 +1070,7 @@ html {
   min-height: 220px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   box-shadow: none;
 }
 
@@ -1268,7 +1268,7 @@ html {
   min-height: 320px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   box-shadow: none;
 }
 
@@ -1300,7 +1300,7 @@ html {
 .editorial-home .location-section__copy,
 .editorial-home .location-section__map {
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   background: var(--paper-warm);
   box-shadow: none;
 }
@@ -1395,7 +1395,7 @@ html {
 .editorial-specialties__card,
 .editorial-specialties__closing-copy {
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   background: var(--paper-warm);
   box-shadow: none;
 }
@@ -1520,7 +1520,7 @@ html {
   min-height: 220px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   box-shadow: none;
 }
 
@@ -1730,7 +1730,7 @@ html {
 .menu-note,
 .menu-card {
   border-radius: 6px;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   background: var(--paper-warm);
   box-shadow: none;
 }
@@ -1824,7 +1824,7 @@ html {
   min-height: 220px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(116, 34, 17, 0.16);
+  border: 1px solid rgba(64, 62, 62, 0.1);
   box-shadow: none;
 }
 
@@ -2182,10 +2182,11 @@ html {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 1rem;
   line-height: 1;
   cursor: help;
   outline: none;
+   z-index: 2;
 }
 
 .allergen-dot::after {
@@ -2221,6 +2222,10 @@ html {
 
 .allergen-dot--dairy {
   color: #7a4a2a;
+}
+
+.allergen-dot--chili {
+  color: #c53b17;
 }
 
 .allergen-dot--gluten {

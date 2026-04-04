@@ -73,7 +73,7 @@ html, body {
   background-repeat: no-repeat, no-repeat;
 
   /* gradiente | SVG */
-  background-position: top, right -200px top 40px;
+  background-position: top, right 0px top 40px;
 
   background-size: auto, 3000px;
   background-attachment: fixed, fixed;
