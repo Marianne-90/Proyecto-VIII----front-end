@@ -2062,7 +2062,7 @@ html {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(34, 18, 9, 0.08), rgba(34, 18, 9, 0.68));
+  background: linear-gradient(200deg, rgba(34, 18, 9, 0), rgba(34, 18, 9, 0.193),rgba(34, 18, 9, 0.827));
 }
 
 .menu-card__visual-caption {

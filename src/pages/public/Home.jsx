@@ -1,7 +1,9 @@
 import img1 from "../../assets/img1.jpg";
 import img2 from "../../assets/img2.jpg";
-import img3 from "../../assets/img3.jpg";
+import img3 from "../../assets/img15.png";
+import img17 from "../../assets/img17.png";
 import img4 from "../../assets/img4.jpg";
+import img5 from "../../assets/img5.jpeg";
 import MapaUsuario from "../../components/public/map";
 
 export default function Home() {
@@ -35,7 +37,7 @@ export default function Home() {
 
           <div className="editorial-home__collage">
             <figure className="editorial-home__photo editorial-home__photo--large">
-              <img src={img3} alt="Pizza italiana recién salida del horno" loading="lazy" />
+              <img src={img17} alt="Pizza italiana recién salida del horno" loading="lazy" />
             </figure>
             <figure className="editorial-home__photo">
               <img src={img4} alt="Exterior del local" loading="lazy" />
@@ -67,7 +69,7 @@ export default function Home() {
 
           <aside className="editorial-home__story-card">
             <figure className="editorial-home__story-card-media">
-              <img src={img2} alt="Pizza italiana servida en mesa" loading="lazy" />
+              <img src={img5} alt="Pizza italiana servida en mesa" loading="lazy" />
             </figure>
             <h3>Lo que define a La Nonnesa</h3>
             <ul className="editorial-home__list">

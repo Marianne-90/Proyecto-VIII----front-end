@@ -11,9 +11,13 @@ import { GiPlantSeed } from "react-icons/gi";
 
 
 import img1 from "../../assets/img1.jpg";
-import img2 from "../../assets/img2.jpg";
-import img3 from "../../assets/img3.jpg";
+import img2 from "../../assets/img12.jpeg";
+import img3 from "../../assets/img20.png";
 import img4 from "../../assets/img4.jpg";
+import diavola from "../../assets/diavola.png";
+import romagnola from "../../assets/romagnola.png";
+import goutmet from "../../assets/goutmet.jpg";
+
 
 const ALLERGENS = {
   chili: { label: "Picante", className: "allergen-dot--chili", icon: GiChiliPepper },
@@ -90,6 +94,8 @@ const classicPizzas = [
     price: "13 €",
     ingredients: "Tomate, mozzarella, parmesano, salami picante, pimiento, aceitunas negras, aceite picante calabrese y orégano.",
     allergens: ["chili", "dairy", "gluten"],
+    image: diavola,
+    visualLabel: "Nuestra DIAVOLA APETECIBLE",
   },
   {
     name: "Capricciosa",
@@ -218,14 +224,15 @@ const gourmetPizzas = [
     name: "Magica",
     price: "15 €",
     ingredients: "Mozzarella, cherrys, aceitunas, prosciutto di Parma D.O.P., burrata, albahaca, lascas de parmesano y aceite de oliva virgen extra.",
-    allergens: ["dairy", "gluten", "soy"],
-    image: img4,
+
   },
   {
     name: "Romagnola",
     price: "15 €",
     ingredients: "Mozzarella, ricotta, albahaca, mortadella bolognese de pistachos, burrata, lascas de parmesano y pistachos.",
     allergens: ["dairy", "gluten", "treeNuts", "soy"],
+    image: romagnola,
+    visualLabel: "pizza in teglia bellissima",
   },
   {
     name: "Parma",
@@ -489,7 +496,7 @@ export default function Carta() {
 
         <section className="menu-page__split">
           <figure className="menu-page__panel-image">
-            <img src={img4} alt="Variedad de pizzas listas para servir" loading="lazy" />
+            <img src={goutmet} alt="Variedad de pizzas listas para servir" loading="lazy" />
           </figure>
 
           <div className="menu-page__panel">
