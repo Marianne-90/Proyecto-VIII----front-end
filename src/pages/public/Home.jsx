@@ -1,9 +1,10 @@
 import img1 from "../../assets/img1.jpg";
-import img2 from "../../assets/img2.jpg";
+import homebanner from "../../assets/homebanner1.png";
 import img3 from "../../assets/img15.png";
 import img17 from "../../assets/img17.png";
 import img4 from "../../assets/img4.jpg";
 import img5 from "../../assets/img5.jpeg";
+import gabryevento from "../../assets/gabryevento.png";
 import MapaUsuario from "../../components/public/map";
 
 export default function Home() {
@@ -40,7 +41,7 @@ export default function Home() {
               <img src={img17} alt="Pizza italiana recién salida del horno" loading="lazy" />
             </figure>
             <figure className="editorial-home__photo">
-              <img src={img4} alt="Exterior del local" loading="lazy" />
+              <img src={homebanner} alt="Exterior del local" loading="lazy" />
             </figure>
             <figure className="editorial-home__photo">
               <img src={img1} alt="Ambiente interior del restaurante" loading="lazy" />
@@ -90,7 +91,7 @@ export default function Home() {
           <div className="editorial-home__grid">
             <article className="editorial-card editorial-card--feature">
               <figure className="editorial-card__media editorial-card__media--tall">
-                <img src={img2} alt="Pizza artesanal preparada para un evento" loading="lazy" />
+                <img src={gabryevento} alt="Pizza artesanal preparada para un evento" loading="lazy" />
               </figure>
               <div className="editorial-card__body">
                 <span className="editorial-card__kicker">Nosotros</span>
@@ -178,7 +179,7 @@ export default function Home() {
 
             <a
               className="location-section__link"
-              href="hhttps://share.google/Xzj0EXY84Vgq1Uymh"
+              href="https://maps.app.goo.gl/LZLkXmzETGS89LNM6"
               target="_blank"
               rel="noopener noreferrer"
             >

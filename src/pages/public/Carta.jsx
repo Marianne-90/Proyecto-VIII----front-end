@@ -13,7 +13,6 @@ import { GiPlantSeed } from "react-icons/gi";
 import img1 from "../../assets/img1.jpg";
 import img2 from "../../assets/img12.jpeg";
 import img3 from "../../assets/img20.png";
-import img4 from "../../assets/img4.jpg";
 import diavola from "../../assets/diavola.png";
 import romagnola from "../../assets/romagnola.png";
 import goutmet from "../../assets/goutmet.jpg";

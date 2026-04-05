@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import img1 from "../../assets/img1.jpg";
 import img2 from "../../assets/img2.jpg";
-import img3 from "../../assets/img3.jpg";
-import img4 from "../../assets/img4.jpg";
+import img9 from "../../assets/img9.jpeg";
+import img10 from "../../assets/img10.jpeg";
+import genovesa from "../../assets/genovessa.png";
+
+import especialidades from "../../assets/especialidades.webp";
 import MapaUsuario from "../../components/public/map";
 
 export default function Especialidades() {
@@ -48,13 +50,13 @@ export default function Especialidades() {
 
           <div className="editorial-specialties__gallery">
             <figure className="editorial-specialties__photo editorial-specialties__photo--large">
-              <img src={img2} alt="Pizza italiana artesanal recién horneada" loading="lazy" />
+              <img src={especialidades} alt="Pizza italiana artesanal recién horneada" loading="lazy" />
             </figure>
             <figure className="editorial-specialties__photo">
-              <img src={img3} alt="Detalle de pizza servida en mesa" loading="lazy" />
+              <img src={img10} alt="Detalle de pizza servida en mesa" loading="lazy" />
             </figure>
             <figure className="editorial-specialties__photo">
-              <img src={img1} alt="Interior del local con ambiente cálido" loading="lazy" />
+              <img src={img9} alt="Interior del local con ambiente cálido" loading="lazy" />
             </figure>
           </div>
         </header>
@@ -96,7 +98,7 @@ export default function Especialidades() {
 
         <section className="editorial-specialties__split">
           <figure className="editorial-specialties__panel-image">
-            <img src={img4} alt="Variedades de focaccia y pizza expuestas en mostrador" loading="lazy" />
+            <img src={genovesa} alt="Variedades de focaccia y pizza expuestas en mostrador" loading="lazy" />
           </figure>
 
           <div className="editorial-specialties__panel">
@@ -188,7 +190,7 @@ export default function Especialidades() {
 
             <a
               className="location-section__link"
-              href="https://share.google/wedjWxYyJ1NZDzXbP"
+              href="https://maps.app.goo.gl/LZLkXmzETGS89LNM6"
               target="_blank"
               rel="noopener noreferrer"
             >

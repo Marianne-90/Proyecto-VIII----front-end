@@ -127,7 +127,7 @@ export default function Contacto() {
               <span className="contact__info-label">Instagram</span>
               <a
                 className="contact__instagram"
-                href="https://instagram.com/pizza_gabri"
+                href="https://www.instagram.com/la_nonesa_pizzaparty/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -235,7 +235,7 @@ export default function Contacto() {
 
             <a
               className="location-section__link"
-              href="https://share.google/wedjWxYyJ1NZDzXbP"
+              href="https://maps.app.goo.gl/LZLkXmzETGS89LNM6"
               target="_blank"
               rel="noopener noreferrer"
             >

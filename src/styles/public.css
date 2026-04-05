@@ -1538,6 +1538,10 @@ html {
   min-height: 460px;
 }
 
+.editorial-specialties__photo:not(.editorial-specialties__photo--large){
+  max-height: 300px;
+}
+
 .editorial-specialties__section {
   padding: 1.45rem;
   display: grid;
