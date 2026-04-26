@@ -43,16 +43,6 @@ export default function Reservar() {
 
     formData.append("access_key", "ad8ad563-7098-431a-9a9c-d8160b4712e7");
 
-    const subject =
-      intent === "fiesta"
-        ? "Reserva: Pizzería móvil para fiesta privada / cumpleaños"
-        : "Nuevo mensaje desde La Nonnesa Pizza Party";
-
-    formData.append("subject", subject);
-    formData.append("from_name", "Web La Nonnesa");
-
-    formData.append("type", intent);
-
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
@@ -61,7 +51,7 @@ export default function Reservar() {
 
       const data = await response.json();
 
-      if (data?.success) {
+      if (response.ok && data?.success) {
         setStatus({
           type: "success",
           message: "Hemos recibido tu solicitud. Te responderemos lo antes posible.",
@@ -71,7 +61,7 @@ export default function Reservar() {
       } else {
         setStatus({
           type: "error",
-          message: "No hemos podido enviar tu solicitud. Revisa los datos e inténtalo de nuevo.",
+          message: data?.message || "No hemos podido enviar tu solicitud. Revisa los datos e inténtalo de nuevo.",
         });
       }
     } catch {
@@ -224,8 +214,26 @@ export default function Reservar() {
             </div>
 
             <form className="contact__form" onSubmit={onSubmit} aria-describedby={`${formId}-status`}>
-              <input className="contact__hp" type="text" name="botcheck" tabIndex="-1" autoComplete="off" />
+              <input
+                className="contact__hp"
+                type="checkbox"
+                name="botcheck"
+                tabIndex="-1"
+                autoComplete="off"
+                hidden
+                aria-hidden="true"
+              />
               <input type="hidden" name="intent" value={intent} />
+              <input
+                type="hidden"
+                name="subject"
+                value={
+                  intent === "fiesta"
+                    ? "Reserva: Pizzería móvil para fiesta privada / cumpleaños"
+                    : "Nuevo mensaje desde La Nonnesa Pizza Party"
+                }
+              />
+              <input type="hidden" name="from_name" value="Web La Nonnesa" />
               {Object.entries(attribution).map(([key, value]) => (
                 <input key={key} type="hidden" name={key} value={value || ""} />
               ))}
