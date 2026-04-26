@@ -1,12 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   clearAuthToken,
   getAuthToken,
   http,
   setAuthToken,
 } from "../services/http";
-
-const AuthContext = createContext(null);
+import { AuthContext } from "./auth-context.js";
 
 function normalizeUser(user) {
   if (!user) return null;
@@ -40,7 +39,7 @@ export function AuthProvider({ children }) {
         const { data } = await http.get("/me");
         if (!isMounted) return;
         setUser(normalizeUser(data));
-      } catch (error) {
+      } catch {
         clearAuthToken();
         if (isMounted) setUser(null);
       } finally {
@@ -115,10 +114,4 @@ export function AuthProvider({ children }) {
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth debe usarse dentro de un <AuthProvider>");
-  return ctx;
 }

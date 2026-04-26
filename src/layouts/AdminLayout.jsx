@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "../components/admin/AdminSidebar.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 
 const DESKTOP_BREAKPOINT = 900;
 
@@ -13,7 +14,6 @@ export default function AdminLayout() {
   // Cerrar sidebar al navegar (móvil / drawer)
   useEffect(() => {
     setIsSidebarOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   // Cerrar sidebar al pasar a desktop

@@ -1,11 +1,22 @@
 import { useEffect, useId, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MapaUsuario from "../../components/public/map";
+import Seo from "../../components/seo/Seo.jsx";
+import { useMarketingAttribution } from "../../hooks/useMarketingAttribution.js";
+import {
+  buildBreadcrumbSchema,
+  buildRestaurantSchema,
+  buildWebPageSchema,
+} from "../../lib/seo.js";
+import { trackEvent } from "../../services/marketing.js";
 
 export default function Contacto() {
   const formId = useId();
   const location = useLocation();
   const [status, setStatus] = useState({ type: "idle", message: "" }); // idle | loading | success | error
+  const attribution = useMarketingAttribution();
+  const seoDescription =
+    "Contacta con La Nonnesa Pizza Party, tu pizzería en Ponferrada, para reservas, grupos, pedidos especiales y eventos privados.";
 
   useEffect(() => {
     if (location.hash !== "#como-llegar") return;
@@ -45,6 +56,7 @@ export default function Contacto() {
           type: "success",
           message: "Hemos recibido tu mensaje. Te responderemos lo antes posible.",
         });
+        trackEvent("generate_lead", { form_name: "contacto", intent: "general" });
         form.reset();
       } else {
         setStatus({
@@ -62,12 +74,39 @@ export default function Contacto() {
 
   return (
     <section className="contact">
+      <Seo
+        title="Contacto de pizzería en Ponferrada"
+        description={seoDescription}
+        path="/contacto"
+        keywords={[
+          "contacto pizzería Ponferrada",
+          "reservas Ponferrada pizza",
+          "teléfono pizzería Ponferrada",
+          "dónde está La Nonnesa",
+          "ubicación La Nonnesa",
+          "pedidos pizza Ponferrada",
+          "eventos privados Ponferrada",
+        ]}
+        jsonLd={[
+          buildRestaurantSchema(),
+          buildWebPageSchema({
+            title: "Contacto de pizzería en Ponferrada",
+            description: seoDescription,
+            path: "/contacto",
+          }),
+          buildBreadcrumbSchema([
+            { name: "Inicio", path: "/" },
+            { name: "Contacto", path: "/contacto" },
+          ]),
+        ]}
+      />
       <div className="contact__wrap">
         <header className="contact__header">
           <span className="contact__badge">La Nonnesa Pizza Party</span>
-          <h1 className="contact__title">Contacto</h1>
+          <h1 className="contact__title">Contacto de La Nonnesa en Ponferrada</h1>
           <p className="contact__subtitle">
-            Si tienes una consulta, quieres organizar una visita o necesitas información sobre grupos, estaremos encantados de ayudarte.
+            Si buscas una pizzería en Ponferrada para reservar, pedir información o preparar una celebración, estamos
+            encantados de ayudarte.
           </p>
         </header>
         <div className="contact__hero-grid">
@@ -117,9 +156,9 @@ export default function Contacto() {
             <div className="contact__info-group">
               <span className="contact__info-label">Teléfono</span>
               <div className="contact__phones">
-                <a href="tel:987197706">987 19 77 06</a>
-                <a href="tel:+34603161579">603 16 15 79</a>
-                <a href="tel:+34667811548">667 81 15 48</a>
+                <a href="tel:987197706" onClick={() => trackEvent("phone_click", { page: "contacto", phone_type: "local" })}>987 19 77 06</a>
+                <a href="tel:+34603161579" onClick={() => trackEvent("phone_click", { page: "contacto", phone_type: "pedidos" })}>603 16 15 79</a>
+                <a href="tel:+34667811548" onClick={() => trackEvent("phone_click", { page: "contacto", phone_type: "alternativo" })}>667 81 15 48</a>
               </div>
             </div>
 
@@ -142,6 +181,9 @@ export default function Contacto() {
 
           <form className="contact__form" onSubmit={onSubmit} aria-describedby={`${formId}-status`}>
             <input className="contact__hp" type="text" name="botcheck" tabIndex="-1" autoComplete="off" />
+            {Object.entries(attribution).map(([key, value]) => (
+              <input key={key} type="hidden" name={key} value={value || ""} />
+            ))}
 
             <div className="contact__form-intro">
               <h3>Envíanos tu consulta</h3>
@@ -238,6 +280,7 @@ export default function Contacto() {
               href="https://maps.app.goo.gl/LZLkXmzETGS89LNM6"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("map_open", { page: "contacto" })}
             >
               Abrir en Google Maps
             </a>

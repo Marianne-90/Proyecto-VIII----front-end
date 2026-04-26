@@ -56,6 +56,9 @@ export default function Navbar() {
           <NavLink to="/reservar" className={linkClass} onClick={close}>
             Reservas
           </NavLink>
+          <NavLink to="/contacto" className={linkClass} onClick={close}>
+            Contacto
+          </NavLink>
         </nav>
       </div>
 

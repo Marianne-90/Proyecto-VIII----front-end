@@ -6,10 +6,45 @@ import img4 from "../../assets/img4.jpg";
 import img5 from "../../assets/img5.jpeg";
 import gabryevento from "../../assets/gabryevento.png";
 import MapaUsuario from "../../components/public/map";
+import Seo from "../../components/seo/Seo.jsx";
+import {
+  buildBreadcrumbSchema,
+  buildRestaurantSchema,
+  buildWebSiteSchema,
+  buildWebPageSchema,
+} from "../../lib/seo.js";
+import { trackEvent } from "../../services/marketing.js";
 
 export default function Home() {
+  const seoDescription =
+    "La Nonnesa Pizza Party es tu pizzería en Ponferrada para comer pizza italiana artesanal, pedir a domicilio o reservar para eventos y celebraciones.";
+
   return (
     <section className="editorial-home">
+      <Seo
+        title="Pizzería en Ponferrada con pizza italiana artesanal"
+        description={seoDescription}
+        path="/"
+        keywords={[
+          "pizzería en Ponferrada",
+          "pizza italiana Ponferrada",
+          "mejor pizza Ponferrada",
+          "dónde comer pizza en Ponferrada",
+          "reservar pizzería Ponferrada",
+          "eventos con pizza Ponferrada",
+          "La Nonnesa Pizza Party",
+        ]}
+        jsonLd={[
+          buildWebSiteSchema(),
+          buildRestaurantSchema(),
+          buildWebPageSchema({
+            title: "Pizzería en Ponferrada con pizza italiana artesanal",
+            description: seoDescription,
+            path: "/",
+          }),
+          buildBreadcrumbSchema([{ name: "Inicio", path: "/" }]),
+        ]}
+      />
       <div className="editorial-home__wrap">
         <header className="editorial-home__hero">
           <div className="editorial-home__intro">
@@ -30,7 +65,11 @@ export default function Home() {
             </div>
 
             <div className="editorial-home__actions">
-              <a href="/contacto#como-llegar" className="editorial-home__cta editorial-home__cta--primary">
+              <a
+                href="/contacto#como-llegar"
+                className="editorial-home__cta editorial-home__cta--primary"
+                onClick={() => trackEvent("cta_click", { cta_name: "como_llegar_home", page: "home" })}
+              >
                 Cómo llegar
               </a>
             </div>
@@ -54,17 +93,18 @@ export default function Home() {
             <span className="editorial-home__eyebrow">Nuestra propuesta</span>
             <h2>Una pizzería pensada para quedarse en la memoria</h2>
             <p>
-              La Nonnesa Pizza Party es una pizzería móvil especializada en la preparación de auténticas pizzas
-              italianas. Trabajamos con ingredientes seleccionados e importados directamente desde Italia para cuidar
-              cada detalle del sabor, la textura y la experiencia en mesa.
+              La Nonnesa Pizza Party combina local y servicio para eventos en Ponferrada con una idea clara: servir
+              pizza italiana de verdad, con ingredientes seleccionados e importados desde Italia y una elaboración
+              artesanal que se nota en cada bocado.
             </p>
             <p>
-              Nuestro equipo vive la pizza con oficio y cercanía. Ya sea para una celebración especial, un evento de
-              empresa o una cena en familia, buscamos que cada servicio se sienta cuidado, ágil y lleno de sabor.
+              Nuestro equipo trabaja para quienes buscan dónde cenar pizza en Ponferrada, organizar una comida de
+              grupo o reservar una propuesta distinta para una celebración especial.
             </p>
             <p>
-              Elaboramos pizzas al estilo tonda, de perfil clásico, pensadas para compartir y disfrutar con calma. La
-              idea es sencilla: llevar una experiencia italiana auténtica allí donde se reúna la gente.
+              Elaboramos pizzas al estilo tonda, de perfil clásico, pensadas para compartir. La idea es sencilla:
+              ofrecer una de las experiencias de pizza italiana más cuidadas de Ponferrada, tanto en el local como en
+              eventos privados.
             </p>
           </div>
 
@@ -95,14 +135,14 @@ export default function Home() {
               </figure>
               <div className="editorial-card__body">
                 <span className="editorial-card__kicker">Nosotros</span>
-                <h3>Auténtica pizza italiana allí donde haya una celebración</h3>
+                <h3>Pizza italiana para celebraciones, cenas y eventos en Ponferrada</h3>
                 <p>
                   Nos enorgullece preparar pizzas con una base artesanal, salsas cuidadas e ingredientes italianos
                   escogidos para ofrecer una experiencia gastronómica honesta y memorable.
                 </p>
                 <p>
-                  Si estás organizando un cumpleaños, una reunión especial o una cena familiar, podemos llevar nuestra
-                  propuesta para convertir ese encuentro en algo todavía más especial.
+                  Si estás organizando un cumpleaños, una reunión especial o una cena familiar en Ponferrada,
+                  podemos llevar nuestra propuesta para convertir ese encuentro en algo todavía más especial.
                 </p>
                 <a href="/contacto" className="editorial-card__link">
                   Contacto
@@ -116,7 +156,7 @@ export default function Home() {
               </figure>
               <div className="editorial-card__body">
                 <span className="editorial-card__kicker">Ponferrada</span>
-                <h3>Nuestro local en la Zona Alta</h3>
+                <h3>Nuestro local en la Zona Alta de Ponferrada</h3>
                 <p>
                   La aventura sobre ruedas encontró también su sitio fijo en Ponferrada, en un espacio pensado para
                   disfrutar de la pizza con una atmósfera cercana y tranquila.
@@ -164,8 +204,8 @@ export default function Home() {
             <span className="location-section__eyebrow">Cómo llegar</span>
             <h2>Encuéntranos en la Zona Alta de Ponferrada</h2>
             <p>
-              Estamos en la calle Obispo Osmundo, 3, en una zona cómoda para acercarte a comer, cenar o recoger tu
-              pedido. Si vienes por primera vez, puedes abrir la ruta directamente desde Google Maps.
+              Estamos en la calle Obispo Osmundo, 3, en una zona cómoda para acercarte a comer pizza en Ponferrada,
+              cenar con calma o recoger tu pedido. Si vienes por primera vez, puedes abrir la ruta directamente desde Google Maps.
             </p>
             <p>
               Si tienes cualquier duda antes de venir, también puedes llamarnos y te ayudaremos a localizar el local
@@ -182,6 +222,7 @@ export default function Home() {
               href="https://maps.app.goo.gl/LZLkXmzETGS89LNM6"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("map_open", { page: "home" })}
             >
               Abrir en Google Maps
             </a>

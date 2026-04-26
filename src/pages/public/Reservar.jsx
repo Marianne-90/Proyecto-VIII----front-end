@@ -1,11 +1,22 @@
 import { useId, useMemo, useState } from "react";
 
 import MapaUsuario from "../../components/public/map";
+import Seo from "../../components/seo/Seo.jsx";
+import { useMarketingAttribution } from "../../hooks/useMarketingAttribution.js";
+import {
+  buildBreadcrumbSchema,
+  buildRestaurantSchema,
+  buildWebPageSchema,
+} from "../../lib/seo.js";
+import { trackEvent } from "../../services/marketing.js";
 
 export default function Reservar() {
   const formId = useId();
   const [status, setStatus] = useState({ type: "idle", message: "" }); // idle | loading | success | error
   const [intent, setIntent] = useState("fiesta"); // fiesta | general
+  const attribution = useMarketingAttribution();
+  const seoDescription =
+    "Reserva en La Nonnesa Pizza Party, pizzería en Ponferrada para eventos privados, comidas de grupo, cumpleaños y celebraciones.";
 
   // Para autocompletar el mensaje cuando el usuario elige “Fiesta privada”
   const defaultMessage = useMemo(() => {
@@ -55,6 +66,7 @@ export default function Reservar() {
           type: "success",
           message: "Hemos recibido tu solicitud. Te responderemos lo antes posible.",
         });
+        trackEvent("generate_lead", { form_name: "reservas", intent });
         form.reset();
       } else {
         setStatus({
@@ -72,12 +84,38 @@ export default function Reservar() {
 
   return (
     <section className="contact">
+      <Seo
+        title="Reservas de pizzería en Ponferrada"
+        description={seoDescription}
+        path="/reservar"
+        keywords={[
+          "reservar pizzería Ponferrada",
+          "reserva restaurante italiano Ponferrada",
+          "eventos privados pizza",
+          "cumpleaños pizzería Ponferrada",
+          "celebraciones con pizza",
+          "La Nonnesa reservas",
+        ]}
+        jsonLd={[
+          buildRestaurantSchema(),
+          buildWebPageSchema({
+            title: "Reservas de pizzería en Ponferrada",
+            description: seoDescription,
+            path: "/reservar",
+          }),
+          buildBreadcrumbSchema([
+            { name: "Inicio", path: "/" },
+            { name: "Reservas", path: "/reservar" },
+          ]),
+        ]}
+      />
       <div className="contact__wrap">
         <header className="contact__header">
           <span className="contact__badge">La Nonnesa Pizza Party</span>
-          <h1 className="contact__title">Reservas y eventos con sabor italiano</h1>
+          <h1 className="contact__title">Reservas en Ponferrada para cenas, grupos y eventos</h1>
           <p className="contact__subtitle">
-            Organizamos cenas especiales, celebraciones y eventos privados con nuestra cocina italiana y un servicio cercano.
+            Organizamos cenas especiales, celebraciones y eventos privados para quienes buscan una pizzería en
+            Ponferrada con cocina italiana y atención cercana.
           </p>
         </header>
 
@@ -130,14 +168,20 @@ export default function Reservar() {
               <button
                 type="button"
                 className={`pill ${intent === "fiesta" ? "is-active" : ""}`}
-                onClick={() => setIntent("fiesta")}
+                onClick={() => {
+                  setIntent("fiesta");
+                  trackEvent("reservation_intent_select", { intent: "fiesta" });
+                }}
               >
                 Reserva para evento privado
               </button>
               <button
                 type="button"
                 className={`pill ${intent === "general" ? "is-active" : ""}`}
-                onClick={() => setIntent("general")}
+                onClick={() => {
+                  setIntent("general");
+                  trackEvent("reservation_intent_select", { intent: "general" });
+                }}
               >
                 Consulta general
               </button>
@@ -156,9 +200,9 @@ export default function Reservar() {
             <div className="contact__info-group">
               <span className="contact__info-label">Teléfono</span>
               <div className="contact__phones">
-                <a href="tel:987197706">987 19 77 06</a>
-                <a href="tel:+34603161579">603 16 15 79</a>
-                <a href="tel:+34667811548">667 81 15 48</a>
+                <a href="tel:987197706" onClick={() => trackEvent("phone_click", { page: "reservar", phone_type: "local" })}>987 19 77 06</a>
+                <a href="tel:+34603161579" onClick={() => trackEvent("phone_click", { page: "reservar", phone_type: "pedidos" })}>603 16 15 79</a>
+                <a href="tel:+34667811548" onClick={() => trackEvent("phone_click", { page: "reservar", phone_type: "alternativo" })}>667 81 15 48</a>
               </div>
             </div>
 
@@ -182,6 +226,9 @@ export default function Reservar() {
             <form className="contact__form" onSubmit={onSubmit} aria-describedby={`${formId}-status`}>
               <input className="contact__hp" type="text" name="botcheck" tabIndex="-1" autoComplete="off" />
               <input type="hidden" name="intent" value={intent} />
+              {Object.entries(attribution).map(([key, value]) => (
+                <input key={key} type="hidden" name={key} value={value || ""} />
+              ))}
 
               <div className="contact__form-intro">
                 <h3>Escríbenos</h3>

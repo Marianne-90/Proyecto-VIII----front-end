@@ -7,9 +7,18 @@ import genovesa from "../../assets/genovessa.png";
 
 import especialidades from "../../assets/especialidades.webp";
 import MapaUsuario from "../../components/public/map";
+import Seo from "../../components/seo/Seo.jsx";
+import {
+  buildBreadcrumbSchema,
+  buildRestaurantSchema,
+  buildWebPageSchema,
+} from "../../lib/seo.js";
+import { trackEvent } from "../../services/marketing.js";
 
 export default function Especialidades() {
   const location = useLocation();
+  const seoDescription =
+    "Prueba las especialidades de La Nonnesa Pizza Party en Ponferrada: pizza en teglia romana, focaccia y propuestas italianas fuera de lo común.";
 
   useEffect(() => {
     if (location.hash !== "#como-llegar-especialidades") return;
@@ -24,14 +33,40 @@ export default function Especialidades() {
 
   return (
     <section className="editorial-specialties">
+      <Seo
+        title="Especialidades de pizza en Ponferrada"
+        description={seoDescription}
+        path="/especialidades"
+        keywords={[
+          "especialidades pizza Ponferrada",
+          "pizza en teglia Ponferrada",
+          "focaccia Ponferrada",
+          "pizza al corte Ponferrada",
+          "especialidades italianas Ponferrada",
+          "pizza romana al corte",
+          "La Nonnesa especialidades",
+        ]}
+        jsonLd={[
+          buildRestaurantSchema(),
+          buildWebPageSchema({
+            title: "Especialidades de pizza en Ponferrada",
+            description: seoDescription,
+            path: "/especialidades",
+          }),
+          buildBreadcrumbSchema([
+            { name: "Inicio", path: "/" },
+            { name: "Especialidades", path: "/especialidades" },
+          ]),
+        ]}
+      />
       <div className="editorial-specialties__wrap">
         <header className="editorial-specialties__hero">
           <div className="editorial-specialties__intro">
             <span className="editorial-specialties__badge">La Nonnesa Pizza Party</span>
-            <h1 className="editorial-specialties__title">Nuestras especialidades</h1>
+            <h1 className="editorial-specialties__title">Especialidades italianas en Ponferrada</h1>
             <p className="editorial-specialties__subtitle">
-              Sumérgete en el sabor auténtico de la pizza italiana con una propuesta elaborada a diario en nuestro
-              local de Ponferrada y pensada también para celebraciones y encargos especiales.
+              Si buscas algo más que una pizza clásica en Ponferrada, aquí encontrarás pizza en teglia, focaccia y
+              elaboraciones italianas preparadas a diario en nuestro local.
             </p>
 
             <div className="editorial-specialties__meta">
@@ -70,9 +105,9 @@ export default function Especialidades() {
           <div className="editorial-specialties__content">
             <div className="editorial-specialties__copy">
               <p>
-                La pizza en teglia forma parte de la tradición italiana, especialmente en Roma, y destaca por su masa
-                de alta hidratación, su fermentación prolongada y una textura ligera que resulta crujiente por fuera y
-                muy aireada por dentro.
+                La pizza en teglia forma parte de la tradición italiana, especialmente en Roma. Si quieres probar una
+                especialidad diferente en Ponferrada, destaca por su masa de alta hidratación, fermentación prolongada
+                y textura ligera, crujiente por fuera y muy aireada por dentro.
               </p>
               <p>
                 En La Nonnesa Pizza Party la elaboramos con ingredientes seleccionados y una atención minuciosa al
@@ -80,8 +115,8 @@ export default function Especialidades() {
               </p>
               <p>
                 Es una opción perfecta para quienes quieren probar distintas combinaciones, compartir en grupo o
-                disfrutar de un formato más informal sin renunciar a una pizza italiana cuidada.
-              </p>
+                descubrir una especialidad italiana poco habitual en Ponferrada sin renunciar a la calidad.
+            </p>
             </div>
 
             <aside className="editorial-specialties__aside">
@@ -177,7 +212,7 @@ export default function Especialidades() {
             <h2>Acércate a probar nuestras especialidades en Ponferrada</h2>
             <p>
               Si quieres venir al local para descubrir la pizza en teglia, la focaccia y las elaboraciones del día,
-              estamos en la Zona Alta, en la calle Obispo Osmundo, 3.
+              estamos en la Zona Alta de Ponferrada, en la calle Obispo Osmundo, 3.
             </p>
             <p>
               Puedes abrir la ubicación directamente en Google Maps y llegar con la ruta preparada desde donde estés.
@@ -193,6 +228,7 @@ export default function Especialidades() {
               href="https://maps.app.goo.gl/LZLkXmzETGS89LNM6"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("map_open", { page: "especialidades" })}
             >
               Abrir en Google Maps
             </a>

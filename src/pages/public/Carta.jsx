@@ -16,6 +16,13 @@ import img3 from "../../assets/img20.png";
 import diavola from "../../assets/diavola.png";
 import romagnola from "../../assets/romagnola.png";
 import goutmet from "../../assets/goutmet.jpg";
+import Seo from "../../components/seo/Seo.jsx";
+import {
+  buildBreadcrumbSchema,
+  buildRestaurantSchema,
+  buildWebPageSchema,
+} from "../../lib/seo.js";
+import { trackEvent } from "../../services/marketing.js";
 
 
 const ALLERGENS = {
@@ -352,6 +359,8 @@ function PizzaSectionGrid({ pizzas, matchesFilters }) {
 export default function Carta() {
   const [activeFilters, setActiveFilters] = useState([]);
   const [filterMode, setFilterMode] = useState("contains");
+  const seoDescription =
+    "Consulta la carta de La Nonnesa Pizza Party, una pizzería en Ponferrada con pizzas italianas clásicas, gourmet e ingredientes seleccionados.";
 
   const filterItems = useMemo(
     () =>
@@ -389,14 +398,40 @@ export default function Carta() {
 
   return (
     <section className="menu-page">
+      <Seo
+        title="Carta de pizzas en Ponferrada"
+        description={seoDescription}
+        path="/carta"
+        keywords={[
+          "carta pizzería Ponferrada",
+          "menú pizza Ponferrada",
+          "pizza gourmet Ponferrada",
+          "pedir pizza en Ponferrada",
+          "pizza italiana artesanal",
+          "pizzas gourmet Ponferrada",
+          "La Nonnesa carta",
+        ]}
+        jsonLd={[
+          buildRestaurantSchema(),
+          buildWebPageSchema({
+            title: "Carta de pizzas en Ponferrada",
+            description: seoDescription,
+            path: "/carta",
+          }),
+          buildBreadcrumbSchema([
+            { name: "Inicio", path: "/" },
+            { name: "Carta", path: "/carta" },
+          ]),
+        ]}
+      />
       <div className="menu-page__wrap">
         <header className="menu-page__hero">
           <div className="menu-page__intro">
             <span className="menu-page__badge">La Nonnesa Pizza Party</span>
-            <h1 className="menu-page__title">Carta de pizzas 100% italianas</h1>
+            <h1 className="menu-page__title">Carta de pizzas italianas en Ponferrada</h1>
             <p className="menu-page__subtitle">
-              Una carta pensada para disfrutar de la pizza clásica, las combinaciones gourmet y el sabor italiano con
-              producto cuidado y masa artesana.
+              Descubre nuestra carta de pizzas clásicas y gourmet si buscas una pizzería en Ponferrada con producto
+              italiano, masa artesana y opciones para repetir.
             </p>
 
             <div className="menu-page__meta">
@@ -486,8 +521,8 @@ export default function Carta() {
             <span className="menu-page__eyebrow">Clásicas</span>
             <h2>Las pizzas que sostienen la casa</h2>
             <p>
-              Recetas reconocibles, elaboradas con ingredientes italianos y una base pensada para que cada pizza tenga
-              equilibrio, carácter y mucha personalidad.
+              Recetas reconocibles elaboradas con ingredientes italianos para quienes quieren acertar al pedir pizza en
+              Ponferrada con sabor auténtico y masa bien trabajada.
             </p>
           </div>
           <PizzaSectionGrid pizzas={classicPizzas} matchesFilters={matchesFilters} />
@@ -502,8 +537,8 @@ export default function Carta() {
             <span className="menu-page__eyebrow">Gourmet</span>
             <h2>Combinaciones con más profundidad, matices y producto</h2>
             <p>
-              En esta parte de la carta aparecen burratas, curados, nduja, guanciale, quesos intensos y recetas que
-              combinan tradición italiana con el estilo propio de La Nonnesa Pizza Party.
+              Aquí aparecen burratas, curados, nduja, guanciale, quesos intensos y recetas que combinan tradición
+              italiana con el estilo propio de una de las cartas más especiales de pizza en Ponferrada.
             </p>
             <p>
               Son pizzas pensadas para quienes disfrutan probando combinaciones con más contraste, más cremosidad o un
@@ -549,7 +584,11 @@ export default function Carta() {
             <span className="menu-page__eyebrow">Pedidos</span>
             <h3>¿Quieres encargar pizzas?</h3>
             <p>Llámanos y te ayudamos con disponibilidad, cantidades y organización del pedido.</p>
-            <a className="menu-note__link" href="tel:+34603161579">
+            <a
+              className="menu-note__link"
+              href="tel:+34603161579"
+              onClick={() => trackEvent("phone_click", { page: "carta", phone_type: "pedidos" })}
+            >
               Llamar al 603 16 15 79
             </a>
           </article>
@@ -558,7 +597,11 @@ export default function Carta() {
             <span className="menu-page__eyebrow">Visítanos</span>
             <h3>Consulta la ubicación del local</h3>
             <p>Encuentra cómo llegar hasta la Zona Alta de Ponferrada y organiza tu visita con antelación.</p>
-            <a className="menu-page__service-link" href="/contacto#como-llegar">
+            <a
+              className="menu-page__service-link"
+              href="/contacto#como-llegar"
+              onClick={() => trackEvent("cta_click", { cta_name: "como_llegar_carta", page: "carta" })}
+            >
               Cómo llegar
             </a>
           </article>
@@ -567,7 +610,11 @@ export default function Carta() {
             <span className="menu-page__eyebrow">Reservas</span>
             <h3>Reserva tu mesa</h3>
             <p>Si prefieres venir al local, puedes acceder a la página de reservas y dejarnos tu solicitud.</p>
-            <a className="menu-page__service-link" href="/reservar">
+            <a
+              className="menu-page__service-link"
+              href="/reservar"
+              onClick={() => trackEvent("cta_click", { cta_name: "ir_reservas_carta", page: "carta" })}
+            >
               Ir a reservas
             </a>
           </article>
