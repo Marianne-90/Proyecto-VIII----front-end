@@ -112,10 +112,6 @@ html {
     transform: none;
   }
 
-  .navlink--admin {
-    margin-left: 0;
-  }
-
   /* Overlay detrás del menú */
   .nav-overlay {
     display: block;
@@ -178,13 +174,6 @@ html {
   color: var(--text);
   border-color: rgba(255, 77, 77, 0.35);
   background: rgba(255, 77, 77, 0.10);
-}
-
-.navlink--admin {
-  margin-left: 0.25rem;
-  color: var(--text);
-  border-color: rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.149);
 }
 
 #navContacto{
