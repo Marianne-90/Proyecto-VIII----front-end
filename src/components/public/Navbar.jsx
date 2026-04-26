@@ -56,9 +56,6 @@ export default function Navbar() {
           <NavLink to="/reservar" className={linkClass} onClick={close}>
             Reservas
           </NavLink>
-          <NavLink to="/admin/login" className="navlink navlink--admin" onClick={close}>
-            Acceso
-          </NavLink>
         </nav>
       </div>
 
